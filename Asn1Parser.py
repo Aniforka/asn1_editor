@@ -134,5 +134,3 @@ class Asn1Parser:
             return f"{tag_class} ({tag_number})"
         else:
             return f"Unknown Class ({tag_class}), Tag ({tag_number})"
-
-    
