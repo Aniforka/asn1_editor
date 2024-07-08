@@ -3,7 +3,8 @@ class Asn1TreeElement:
             self,
             parent=None,
             decode_value=None,
-            encode_value=None, tag_type=None,
+            encode_value=None,
+            tag_type=None,
             length=-1,
             offset=-1,
             uid=-1)-> None:
