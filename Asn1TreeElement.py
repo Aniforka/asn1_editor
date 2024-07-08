@@ -1,11 +1,14 @@
 class Asn1TreeElement:
     def __init__(
             self,
+            parent=None,
             decode_value=None,
             encode_value=None, tag_type=None,
             length=None,
             offset=None,
             uid=None)-> None:
+        
+        self.parent = parent
         self.childs = None
         self.decode_value = decode_value
         self.encode_value = encode_value
