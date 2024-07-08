@@ -13,3 +13,9 @@ class Asn1TreeElement:
         self. length = length
         self.offset = offset
         self.uid = uid
+
+    def add_child(self, element) -> None:
+        if self.childs is None:
+            self.childs = list()
+
+        self.child.append(element)
