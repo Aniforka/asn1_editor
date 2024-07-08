@@ -19,7 +19,7 @@ class Asn1TreeElement:
         self.uid = uid
 
     def add_child(self, element) -> None:
-        self.child.append(element)
+        self.childs.append(element)
 
     def get_length(self) -> int:
         return self.length
