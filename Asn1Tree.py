@@ -75,11 +75,11 @@ class Asn1Tree:
             current_node, level = nodes_to_visit.pop(0)
     
             answer += "  " * level
-            answer += f"({current_node.get_offset()}, {current_node.get_length()}) {current_node.get_tag_type()} "
+            answer += f"({current_node.get_offset()}, {current_node.get_length()}) {current_node.get_tag_type()}"
             value = current_node.get_decode_value()
 
             if value is not None:
-                answer += f"VALUE: {value}"
+                answer += f": {value}"
 
             answer += '\n'
 
