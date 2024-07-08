@@ -53,6 +53,7 @@
     <addaction name="file_save_action"/>
     <addaction name="file_save_as_action"/>
     <addaction name="separator"/>
+    <addaction name="clear_all_action"/>
    </widget>
    <widget class="QMenu" name="menu_2">
     <property name="title">
@@ -76,6 +77,11 @@
   <action name="file_save_action">
    <property name="text">
     <string>Сохранить</string>
+   </property>
+  </action>
+  <action name="clear_all_action">
+   <property name="text">
+    <string>Очистить всё</string>
    </property>
   </action>
  </widget>
