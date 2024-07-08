@@ -53,7 +53,9 @@ class Asn1Parser:
 
             offset += length
 
-        return (offset, tag_type, length, value, decoded_value)
+        displayed_offset = offset - 1 - length_len if length_len else offset - 2
+
+        return (offset, displayed_offset, tag_type, length, value, decoded_value)
 
 
     @staticmethod
