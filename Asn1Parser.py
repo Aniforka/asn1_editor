@@ -67,7 +67,7 @@ class Asn1Parser:
         if tag_type == "INTEGER":
             return hex(int.from_bytes(value, byteorder="big", signed=True))[2:].upper()
         if tag_type == "OCTET STRING":
-            return value.hex()
+            return value.hex().upper()
         if tag_type == "OBJECT IDENTIFIER":
             oid_bytes = bytearray()
             oid_bytes.append(0x06)  # Тег OBJECT IDENTIFIER
@@ -90,7 +90,7 @@ class Asn1Parser:
                 return value.decode("ascii") 
             except ValueError:
                 return f"Invalid GeneralizedTime: {value.hex()}"
-        return value.hex()  # По умолчанию возвращаем шестнадцатеричное представление
+        return value.hex().upper()  # По умолчанию возвращаем шестнадцатеричное представление
 
     @staticmethod
     def __get_tag_type(tag_class: str, tag_number: int) -> str:
