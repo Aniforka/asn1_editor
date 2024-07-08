@@ -51,7 +51,7 @@ class Asn1Tree:
         if parrent is None:
             return False
 
-        return (parrent.get_length() + parrent.get_offset() == cur_node.get_length() + cur_node.get_offset())
+        return (parrent.get_length() + parrent.get_offset() <= cur_node.get_length() + cur_node.get_offset())
 
 
     def export_from_file(self, file_path: str) -> None:
