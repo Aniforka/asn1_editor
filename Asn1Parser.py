@@ -43,6 +43,7 @@ class Asn1Parser:
         ]
         tag_type = Asn1Parser.__get_tag_type(tag_class, tag_number)
 
+        displayed_offset = offset - 1 - length_len if length_len else offset - 2
 
         # Обработка значения
         if not constructed:
@@ -52,8 +53,6 @@ class Asn1Parser:
             decoded_value = Asn1Parser.__decode_primitive_value(tag_type, value, length)
 
             offset += length
-
-        displayed_offset = offset - 1 - length_len if length_len else offset - 2
 
         return (offset, displayed_offset, tag_type, length, value, decoded_value, constructed)
 
