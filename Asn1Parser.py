@@ -61,7 +61,7 @@ class Asn1Parser:
         pass
 
     @staticmethod
-    def __decode_primitive_value(tag_type, value, length):
+    def __decode_primitive_value(tag_type: str, value, length: int):
         """Декодирует значение примитивного типа ASN.1."""
         if tag_type == "INTEGER":
             return hex(int.from_bytes(value, byteorder="big", signed=True))[2:].upper()
@@ -92,7 +92,7 @@ class Asn1Parser:
         return value.hex()  # По умолчанию возвращаем шестнадцатеричное представление
 
     @staticmethod
-    def __get_tag_type(tag_class, tag_number):
+    def __get_tag_type(tag_class: str, tag_number: int) -> str:
         """Возвращает строковое представление типа тега."""
         if tag_class == "Universal":
             return {
