@@ -45,6 +45,19 @@ class Asn1Parser:
 
         displayed_offset = offset - 1 - length_len if length_len else offset - 2
 
+        # костыль
+        if tag_type == "OCTET STRING":
+            try: 
+                tmp_offset, tmp_displayed_offset, tmp_tag_type, tmp_length, tmp_value, tmp_decoded_value, tmp_constructed = Asn1Parser.decode(data, offset)
+            except: pass
+            else:
+                if not "Private" in tmp_tag_type:
+                    constructed = True
+                    return (offset, displayed_offset, tag_type, length, value, decoded_value, constructed)
+        # костыль
+
+
+
         # Обработка значения
         if not constructed:
             # Декодируем значение для primitive типов
