@@ -63,7 +63,7 @@ class Asn1Tree:
     def add_node(element: Asn1TreeElement, uid: int) -> None:
         pass
 
-    def get_root(self) -> Asn1TreeElement | None:
+    def get_root(self) -> Asn1TreeElement:
         return self.root
     
     def __repr__(self) -> str:
