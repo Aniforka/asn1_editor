@@ -10,14 +10,22 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
         uic.loadUi('ui/MainWindow.ui', self)
 
         self.tree = Asn1Tree()
-        self.cur_file = None
+        self.__init_vars()
 
         self.show()
 
         self.file_open_action.triggered.connect(self.load_file)
         self.clear_all_action.triggered.connect(self.clear_all)
 
+    def __init_vars(self):
+        self.treeWidget.clear()
+        del self.tree
+        self.tree = Asn1Tree()
+        self.cur_file = None
+
     def load_file(self):
+        self.__init_vars()
+
         file = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', os.getcwd(), "Сертификаты (*.cer);;Все файлы (*)")
         if file:
             self.cur_file = file[0]
@@ -51,10 +59,7 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
         self.treeWidget.expandAll()
 
     def clear_all(self):
-        self.treeWidget.clear()
-        del self.tree
-        self.tree = Asn1Tree()
-        self.cur_file = None
+        self.__init_vars()
 
 
 if __name__ == "__main__":
