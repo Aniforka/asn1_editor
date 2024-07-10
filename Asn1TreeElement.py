@@ -7,40 +7,58 @@ class Asn1TreeElement:
             tag_type=None,
             length=-1,
             offset=-1,
-            uid=-1)-> None:
+            uid=-1,
+            encode_tag=None,
+            encode_tag_number=None,
+            encode_class=None,
+            encode_offset=None)-> None:
         
-        self.parent = parent
-        self.childs = list()
-        self.decode_value = decode_value
-        self.encode_value = encode_value
-        self.tag_type = tag_type
-        self.length = length
-        self.offset = offset
-        self.uid = uid
+        self.__parent = parent
+        self.__childs = list()
+        self.__decode_value = decode_value
+        self.__encode_value = encode_value
+        self.__tag_type = tag_type
+        self.__length = length
+        self.__offset = offset
+        self.__uid = uid
+
+        self.__encode_tag = encode_tag
+        self.__encode_tag_number = encode_tag_number
+        self.__encode_class = encode_class
+        self.__encode_offset = encode_offset
 
     def add_child(self, element) -> None:
-        self.childs.append(element)
+        self.__childs.append(element)
 
     def get_length(self) -> int:
-        return self.length
+        return self.__length
 
     def get_offset(self) -> int:
-        return self.offset
+        return self.__offset
 
     def get_decode_value(self) -> str:
-        return self.decode_value
+        return self.__decode_value
     
     def get_encode_value(self):
-        return self.encode_value
+        return self.__encode_value
     
     def get_tag_type(self) -> str:
-        return self.tag_type
+        return self.__tag_type
     
     def get_uid(self) -> int:
-        return self.uid
+        return self.__uid
 
     def get_parrent(self):
-        return self.parent
+        return self.__parent
     
     def get_childs(self):
-        return self.childs
+        return self.__childs
+    
+    def get_encode_tag(self):
+        return self.__encode_tag
+    
+    def get_encode_tag_number(self):
+        return self.__encode_tag_number
+    
+    def get_encode_class(self):
+        return self.__encode_class

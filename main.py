@@ -15,6 +15,7 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
         self.show()
 
         self.file_open_action.triggered.connect(self.load_file)
+        self.file_save_as_action.triggered.connect(self.save_file_as)
         self.clear_all_action.triggered.connect(self.clear_all)
 
     def __init_vars(self):
@@ -31,6 +32,13 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
             self.cur_file = file[0]
             self.tree.import_from_file(file[0])
             self.draw_tree()
+
+    def save_file_as(self):
+        if self.tree.get_root() is not None:
+            file = QtWidgets.QFileDialog.getSaveFileName(self,'Сохранить файл', self.cur_file, "Сертификаты (*.cer);;Все файлы (*)")
+            self.tree.export_to_file(file[0])
+        else:
+            print("Warning!")
 
     def draw_tree(self):
         self.treeWidget.clear()
@@ -53,7 +61,7 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
             else:
                 parent_item.addChild(item)
 
-            for child in reversed(current_node.childs):
+            for child in reversed(current_node.get_childs()):
                 nodes_to_visit.insert(0, (child, item))
 
         self.treeWidget.expandAll()

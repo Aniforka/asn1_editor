@@ -15,7 +15,7 @@ class Asn1Tree:
         cur_elem = None
 
         while offset < len(data):
-            new_offset, displayed_offset, tag_type, length, value, decoded_value, __constructed = Asn1Parser.decode(data, offset)
+            new_offset, displayed_offset, tag_type, length, value, decoded_value, __constructed, encode_info = Asn1Parser.decode(data, offset)
 
             new_element = Asn1TreeElement(
                 cur_elem,
@@ -23,7 +23,8 @@ class Asn1Tree:
                 value, tag_type,
                 length,
                 displayed_offset,
-                self.count_of_elements
+                self.count_of_elements,
+                *encode_info
             )
 
             
@@ -54,8 +55,32 @@ class Asn1Tree:
         return (parrent.get_length() + parrent.get_offset() <= cur_node.get_length() + cur_node.get_offset())
 
 
-    def export_from_file(self, file_path: str) -> None:
-        pass
+    def export_to_file(self, file_path: str) -> None:
+        f_out = open(file_path, "wb")
+        nodes_to_visit = [(self.root, 0)]
+
+        while nodes_to_visit:
+            current_node, level = nodes_to_visit.pop(0)
+
+            # if current_node.get_tag_type() == "OBJECT IDENTIFIER":
+            # print('aboba',current_node.get_offset(), current_node.get_encode_tag_number())
+
+            constructed = True if current_node.get_childs() and current_node.get_tag_type() != "OCTET STRING" else False
+
+            f_out.write(
+                Asn1Parser.encode(
+                    current_node.get_length(),
+                    current_node.get_encode_tag_number(),
+                    current_node.get_encode_class(),
+                    current_node.get_decode_value(),
+                    constructed
+                )
+            )
+
+            for child in reversed(current_node.get_childs()):
+                nodes_to_visit.insert(0, (child, level + 1))
+
+        f_out.close()
 
     def remove_node(self, uid: int) -> None:
         pass
@@ -83,7 +108,7 @@ class Asn1Tree:
 
             answer += '\n'
 
-            for child in reversed(current_node.childs):
+            for child in reversed(current_node.get_childs()):
                 nodes_to_visit.insert(0, (child, level + 1))
 
         return answer

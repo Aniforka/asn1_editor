@@ -79,14 +79,15 @@ class Asn1Parser:
         displayed_offset = offset - 1 - length_len if length_len else offset - 2
         # print(Asn1Parser.is_valid_asn1(data[offset:offset + length]))
         # костыль
+        encode_info = [tag, tag_number, class_ >> 6, offset]
         if tag_type == "OCTET STRING" and Asn1Parser.is_valid_asn1(data[offset:offset + length]):
             try: 
-                _, _, tmp_tag_type, _, _, _, _ = Asn1Parser.decode(data, offset)
+                _, _, tmp_tag_type, _, _, _, _, _ = Asn1Parser.decode(data, offset)
             except: pass
             else:
                 if not "Private" in tmp_tag_type:
                     constructed = True
-                    return (offset, displayed_offset, tag_type, length, value, decoded_value, constructed)
+                    return (offset, displayed_offset, tag_type, length, value, decoded_value, constructed, encode_info)
         # костыль
 
 
@@ -100,12 +101,76 @@ class Asn1Parser:
 
             offset += length
 
-        return (offset, displayed_offset, tag_type, length, value, decoded_value, constructed)
+        return (offset, displayed_offset, tag_type, length, value, decoded_value, constructed, encode_info)
 
 
     @staticmethod
-    def encode(value, type, length):
-        pass
+    def encode(length: int, tag_number: int, class_: int, value=None, constructed=False) -> bytes:
+        """
+        Кодирует тег ASN.1, длину и значение, если оно есть.
+
+        Args:
+            length: Длина значения.
+            tag_number: Номер тега ASN.1.
+            class_: Класс тега ASN.1 (0 - Universal, 1 - Application, 2 - Context-specific, 3 - Private).
+            value: Значение для кодирования (может быть None).
+
+        Returns:
+            Строку байтов, представляющую закодированный тег, длину и значение (если есть).
+        """
+        # print(class_)
+        if class_ < 0 or class_ > 3:
+            raise ValueError("Неверный класс тега. Допустимые значения: 0, 1, 2, 3.")
+        
+        tag_class = ["Universal", "Application", "Context-specific", "Private"][class_]
+
+        tag = (class_ << 6) | tag_number
+        if constructed:
+            tag |= 0x20  # Установить 6-й бит (constructed flag)
+
+        encoded_data = bytearray()
+        encoded_data.append(tag)
+        encoded_data.extend(Asn1Parser.__encode_length(length))
+
+        # print(Asn1Parser.__get_tag_type(tag_class, tag_number), tag_class, tag_number, class_)
+
+        if value is not None:
+            tag_type = Asn1Parser.__get_tag_type(tag_class, tag_number)
+            # print(tag_type)
+            encoded_value = Asn1Parser.__encode_value(value, tag_type)
+            encoded_data.extend(encoded_value)
+
+        # print(encoded_data.hex().upper())
+        return bytes(encoded_data)
+
+    @staticmethod
+    def __encode_value(value, tag_type: str) -> bytes:
+        """Кодирует значение в соответствии с типом тега."""
+        if tag_type == "INTEGER":
+            return int(value, 16).to_bytes((len(value) + 1) // 2, byteorder="big", signed=True)
+        elif tag_type == "OCTET STRING":
+            return bytes.fromhex(value)
+        elif tag_type == "OBJECT IDENTIFIER":
+            # print(value)
+            oid = core.ObjectIdentifier(value=value)
+            return oid.dump()[2:]  # Убираем первые два байта (тег и длина)
+        elif tag_type in ("UTF8String", "PrintableString", "IA5String", "VisibleString"):
+            return value.encode("utf-8")
+        elif tag_type == "UTCTime":
+            return value.encode("ascii")
+        elif tag_type == "GeneralizedTime":
+            return value.encode("ascii")
+        else:
+            return bytes.fromhex(value)
+
+    @staticmethod
+    def __encode_length(length: int) -> bytes:
+        """Кодирует длину значения."""
+        if length < 128:
+            return bytes([length])
+        else:
+            length_bytes = length.to_bytes((length.bit_length() + 7) // 8, byteorder="big")
+            return bytes([0x80 | len(length_bytes)]) + length_bytes
 
     def is_valid_asn1(data: bytes) -> bool:
         """
