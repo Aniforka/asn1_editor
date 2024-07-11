@@ -27,11 +27,7 @@
      </layout>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="Layout_Tree">
-      <item>
-       <widget class="QTreeWidget" name="treeWidget"/>
-      </item>
-     </layout>
+     <layout class="QVBoxLayout" name="Layout_Tree"/>
     </item>
    </layout>
   </widget>

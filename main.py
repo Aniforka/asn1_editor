@@ -3,11 +3,16 @@ import sys
 import os
 
 from Asn1Tree import Asn1Tree
+from MyTreeWidget import MyTreeWidget
+from MyTreeWidgetItem import MyTreeWidgetItem
 
 class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого интерфейса программы
     def __init__(self):
         super(Ui, self).__init__()
         uic.loadUi('ui/MainWindow.ui', self)
+
+        self.treeWidget = MyTreeWidget()
+        self.Layout_Tree.addWidget(self.treeWidget)
 
         self.tree = Asn1Tree()
         self.__init_vars()
@@ -18,6 +23,23 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
         self.file_save_as_action.triggered.connect(self.save_file_as)
         self.clear_all_action.triggered.connect(self.clear_all)
 
+        self.file_filter = (
+            "Сертификаты (*.cer *.crl);; "  # Сертификаты и списки отзыва сертификатов
+            "Запросы на сертификаты (*.p10);; "  # Запросы на сертификаты
+            "Файлы подписи (*.p7s);; "  # Файлы подписи
+            "Все файлы (*)"  # На всякий случай, для отображения всех файлов 
+        )
+
+        # self.file_filter = (
+        #     "Сертификаты (*.cer *.crt *.der);; "
+        #     "Запросы на сертификаты (*.csr *.p10);; "
+        #     "Закрытые ключи (*.key *.pem);; "
+        #     "Списки отозванных сертификатов (*.crl);; "
+        #     "Файлы PKCS#7 (*.p7b *.p7c *.p7m *.p7r *.p7s);; "
+        #     "Файлы PKCS#12 (*.p12 *.pfx);; "
+        #     "Все файлы (*)" 
+        # )
+
     def __init_vars(self):
         self.treeWidget.clear()
         del self.tree
@@ -27,18 +49,34 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
     def load_file(self):
         self.__init_vars()
 
-        file = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', os.getcwd(), "Сертификаты (*.cer);;Все файлы (*)")
+        file = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', os.getcwd(), self.file_filter)
+        
         if file:
             self.cur_file = file[0]
-            self.tree.import_from_file(file[0])
-            self.draw_tree()
+            try:
+                self.tree.import_from_file(file[0])
+                self.draw_tree()
+            except Exception as exp:
+                QtWidgets.QMessageBox.critical(self, 'Ошибка чтения', 'Не удалось считать файл', QtWidgets.QMessageBox.Ok)
+                print(exp)
+                return
 
     def save_file_as(self):
         if self.tree.get_root() is not None:
-            file = QtWidgets.QFileDialog.getSaveFileName(self,'Сохранить файл', self.cur_file, "Сертификаты (*.cer);;Все файлы (*)")
-            self.tree.export_to_file(file[0])
+            file = QtWidgets.QFileDialog.getSaveFileName(self,'Сохранить файл', self.cur_file, self.file_filter)
+            if file:
+                try:
+                    self.tree.export_to_file(file[0])
+                except Exception as exp:
+                    QtWidgets.QMessageBox.critical(self, 'Ошибка сохранения', 'Не удалось сохранить файл', QtWidgets.QMessageBox.Ok)
+                    print(exp)
+                    return
+            else:
+                QtWidgets.QMessageBox.critical(self, 'Ошибка сохранения', 'Файл для сохранения не указан', QtWidgets.QMessageBox.Ok)
+                return
         else:
-            print("Warning!")
+            QtWidgets.QMessageBox.critical(self, 'Ошибка сохранения', 'Нет данных для сохранения', QtWidgets.QMessageBox.Ok)
+            return
 
     def draw_tree(self):
         self.treeWidget.clear()
@@ -49,7 +87,7 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
         while nodes_to_visit:
             current_node, parent_item = nodes_to_visit.pop(0)
 
-            item = QtWidgets.QTreeWidgetItem(parent_item)
+            item = MyTreeWidgetItem(current_node, parent_item)
             item_text = f"({current_node.get_offset()}, {current_node.get_length()}) {current_node.get_tag_type()}"
             value = current_node.get_decode_value()
             if value is not None:
