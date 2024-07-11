@@ -97,34 +97,28 @@ class Asn1Tree:
         additional_offset = 0
 
         was_element = False
-        is_parrent = True
-        nodes_to_visit = [(self.root, 0)]
+        nodes_to_visit = [self.root]
 
         while nodes_to_visit:
-            current_node, level = nodes_to_visit.pop(0)
+            current_node = nodes_to_visit.pop(0)
 
             if current_node.get_uid() == element.get_uid():
                 was_element = True
                 current_node.get_parrent().get_childs().remove(element)
                 continue
 
-            print(is_parrent, was_element, current_node.get_decode_value(), offset_changes)
-
-            if self.__is_grand_parrent(current_node, element.get_uid()):
+            if self.__is_grand_parrent(current_node, element.get_uid()): # Элементы выше и включают в себя "наш" элемент
                 new_length = current_node.get_length() - offset_changes
                 offset = Asn1Parser.get_length_len(current_node.get_length()) - Asn1Parser.get_length_len(new_length)
-                additional_offset += offset
+                additional_offset += abs(offset)
                 current_node.set_length(new_length)
-            elif was_element:
+            elif was_element: # элементы ниже "нашего" элемента
                 current_node.set_offset(current_node.get_offset() - offset_changes - additional_offset)
-            else: 
+            else:  # элементы выше и НЕ включают в себя "наш" элемент
                 current_node.set_offset(current_node.get_offset() - additional_offset)
 
-            if current_node.get_uid() == element.get_parrent().get_uid():
-                is_parrent = False
-
             for child in reversed(current_node.get_childs()):
-                nodes_to_visit.insert(0, (child, level + 1))
+                nodes_to_visit.insert(0, child)
 
     def __is_grand_parrent(self, current_node: Asn1TreeElement, uid: int):
         nodes_to_visit = [current_node]
@@ -171,34 +165,27 @@ class Asn1Tree:
         additional_offset = 0
 
         was_element = False
-        is_parrent = True
-        nodes_to_visit = [(self.root, 0)]
+        nodes_to_visit = [self.root]
 
         while nodes_to_visit:
-            current_node, level = nodes_to_visit.pop(0)
+            current_node = nodes_to_visit.pop(0)
 
-            if current_node.get_uid() == self.next_uid - 1:
+            if current_node.get_uid() == new_element.get_uid():
                 was_element = True
-                current_node.set_offset(current_node.get_offset() + additional_offset)
                 continue
 
-            if is_parrent:
+            if self.__is_grand_parrent(current_node, new_element.get_uid()): # Элементы выше и включают в себя "наш" элемент
                 new_length = current_node.get_length() + offset_changes
                 offset = Asn1Parser.get_length_len(current_node.get_length()) - Asn1Parser.get_length_len(new_length)
                 additional_offset += offset
                 current_node.set_length(new_length)
-            elif was_element:
+            elif was_element: # элементы ниже "нашего" элемента
                 current_node.set_offset(current_node.get_offset() + offset_changes + additional_offset)
+            else:  # элементы выше и НЕ включают в себя "наш" элемент
+                current_node.set_offset(current_node.get_offset() + additional_offset)
 
-            if current_node.get_uid() == parrent.get_uid():
-                is_parrent = False
-
-            nodes_to_visit_tmp = list()
-            for child in (current_node.get_childs()):
-                nodes_to_visit_tmp.append((child, level + 1))
-                # nodes_to_visit.insert(0, (child, level + 1, is_parrent, was_element))
-            nodes_to_visit_tmp.extend(nodes_to_visit.copy())
-            nodes_to_visit = nodes_to_visit_tmp.copy()
+            for child in reversed(current_node.get_childs()):
+                nodes_to_visit.insert(0, child)
 
     def edit_node(self, element: Asn1TreeElement, new_value: str, is_hex=False) -> None:
         old_length = element.get_length()
