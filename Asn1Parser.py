@@ -61,7 +61,7 @@ class Asn1Parser:
         # Читаем длину значения
         length = data[offset]
         offset += 1
-        length_len = 0
+        length_len = 1
         if length & 0x80:
             length_len = length & 0x7F
             length = 0
@@ -87,7 +87,7 @@ class Asn1Parser:
             else:
                 if not "Private" in tmp_tag_type:
                     constructed = True
-                    return (offset, displayed_offset, tag_type, length, value, decoded_value, constructed, encode_info)
+                    return (offset, displayed_offset, tag_type, length, length_len, value, decoded_value, constructed, encode_info)
         # костыль
 
 
@@ -101,7 +101,7 @@ class Asn1Parser:
 
             offset += length
 
-        return (offset, displayed_offset, tag_type, length, value, decoded_value, constructed, encode_info)
+        return (offset, displayed_offset, tag_type, length, length_len, value, decoded_value, constructed, encode_info)
 
 
     @staticmethod

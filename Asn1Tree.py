@@ -15,13 +15,14 @@ class Asn1Tree:
         cur_elem = None
 
         while offset < len(data):
-            new_offset, displayed_offset, tag_type, length, value, decoded_value, __constructed, encode_info = Asn1Parser.decode(data, offset)
+            new_offset, displayed_offset, tag_type, length, length_len, value, decoded_value, __constructed, encode_info = Asn1Parser.decode(data, offset)
 
             new_element = Asn1TreeElement(
                 cur_elem,
                 decoded_value,
                 value, tag_type,
                 length,
+                length_len,
                 displayed_offset,
                 self.count_of_elements,
                 *encode_info
