@@ -203,26 +203,30 @@ class Asn1Tree:
         offset_changes = element.get_length() - old_length +\
             Asn1Parser.get_length_len(element.get_length()) - Asn1Parser.get_length_len(old_length)
 
+        additional_offset = 0
+
         was_element = False
-        nodes_to_visit = [(self.root, 0)]
+        nodes_to_visit = [self.root]
 
         while nodes_to_visit:
-            current_node, level = nodes_to_visit.pop(0)
+            current_node = nodes_to_visit.pop(0)
 
             if current_node.get_uid() == element.get_uid():
                 was_element = True
                 continue
 
-            if was_element:
-                current_node.set_offset(current_node.get_offset() + offset_changes)
-            else:
+            if self.__is_grand_parrent(current_node, element.get_uid()): # Элементы выше и включают в себя "наш" элемент
                 new_length = current_node.get_length() + offset_changes
                 offset = Asn1Parser.get_length_len(current_node.get_length()) - Asn1Parser.get_length_len(new_length)
-                offset_changes += offset
+                additional_offset += offset
                 current_node.set_length(new_length)
+            elif was_element: # элементы ниже "нашего" элемента
+                current_node.set_offset(current_node.get_offset() + offset_changes + additional_offset)
+            else:  # элементы выше и НЕ включают в себя "наш" элемент
+                current_node.set_offset(current_node.get_offset() + additional_offset)
 
             for child in reversed(current_node.get_childs()):
-                nodes_to_visit.insert(0, (child, level + 1))
+                nodes_to_visit.insert(0, child)
 
 
     def get_root(self) -> Asn1TreeElement:
