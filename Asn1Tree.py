@@ -166,10 +166,9 @@ class Asn1Tree:
                 current_node.set_length(new_length)
             elif was_element:
                 current_node.set_offset(current_node.get_offset() + offset_changes + additional_offset)
-            print(current_node.get_decode_value(), is_parrent, was_element)
+
             if current_node.get_uid() == parrent.get_uid():
                 is_parrent = False
-                print('aboba')
 
             nodes_to_visit_tmp = list()
             for child in (current_node.get_childs()):
