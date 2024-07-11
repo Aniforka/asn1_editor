@@ -53,6 +53,7 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
         self.tree = Asn1Tree()
         self.cur_file = None
 
+
     def load_file(self):
         self.__init_vars()
 
@@ -67,6 +68,7 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
                 QtWidgets.QMessageBox.critical(self, 'Ошибка чтения', 'Не удалось считать файл', QtWidgets.QMessageBox.Ok)
                 print(exp)
                 return
+
 
     def save_file_as(self):
         if self.tree.get_root() is not None:
@@ -84,6 +86,7 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
         else:
             QtWidgets.QMessageBox.critical(self, 'Ошибка сохранения', 'Нет данных для сохранения', QtWidgets.QMessageBox.Ok)
             return
+
 
     def draw_tree(self):
         self.tree_widget.clear()
@@ -111,6 +114,7 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
 
         self.tree_widget.expandAll()
 
+
     def create_tree_item(self):
         dialog = EditDialog(self)
         dialog.data_input.setDisabled(True)
@@ -119,6 +123,7 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
             tag = dialog.tag_input.text()
 
             print(f"Tag: {tag}\n")
+
 
     def edit_tree_item(self):
         dialog = EditDialog(self)
@@ -141,7 +146,10 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
 
         if dialog.exec_() == QtWidgets.QDialog.Accepted:
             if not is_parrent:
-                pass
+                new_value = dialog.data_input.toPlainText()
+                self.tree.edit_node(tree_item, new_value)
+
+        self.draw_tree()
 
 
     def delete_tree_item(self):
