@@ -118,10 +118,15 @@ class Asn1Tree:
     def add_node(self, element: Asn1TreeElement) -> None:
         pass
 
-    def edit_node(self, element: Asn1TreeElement, new_value: str) -> None:
+    def edit_node(self, element: Asn1TreeElement, new_value: str, is_hex=False) -> None:
         old_length = element.get_length()
 
-        new_encode_value = Asn1Parser.encode_value(new_value, element.get_tag_type())
+        if is_hex:
+            new_encode_value = bytes.fromhex(new_value.replace(" ", ""))
+            value = Asn1Parser.decode_primitive_value(element.get_tag_type(), new_encode_value, len(new_encode_value))
+        else:
+            new_encode_value = Asn1Parser.encode_value(new_value, element.get_tag_type())
+
         element.set_value(new_value)
         element.set_length(len(new_encode_value))
         element.set_encode_value(new_encode_value)

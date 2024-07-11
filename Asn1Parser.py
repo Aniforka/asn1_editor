@@ -97,7 +97,7 @@ class Asn1Parser:
             # Декодируем значение для primitive типов
             value = data[offset : offset + length]
 
-            decoded_value = Asn1Parser.__decode_primitive_value(tag_type, value, length)
+            decoded_value = Asn1Parser.decode_primitive_value(tag_type, value, length)
 
             offset += length
 
@@ -313,7 +313,7 @@ class Asn1Parser:
     #     return True
 
     @staticmethod
-    def __decode_primitive_value(tag_type: str, value, length: int):
+    def decode_primitive_value(tag_type: str, value, length: int):
         """Декодирует значение примитивного типа ASN.1."""
         if tag_type == "INTEGER":
             return hex(int.from_bytes(value, byteorder="big", signed=True))[2:].upper()

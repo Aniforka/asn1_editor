@@ -44,6 +44,7 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
 
         self.tree_widget.create_item_signal.connect(self.create_tree_item)
         self.tree_widget.edit_item_signal.connect(self.edit_tree_item)
+        self.tree_widget.edit_hex_item_signal.connect(self.edit_hex_tree_item)
         self.tree_widget.delete_item_signal.connect(self.delete_tree_item)
 
 
@@ -154,6 +155,36 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
 
         self.draw_tree()
 
+    def edit_hex_tree_item(self):
+        dialog = EditDialog(self)
+        dialog.tag_input.setDisabled(True)
+
+        cur_item = self.tree_widget.currentItem()
+
+        tree_item = cur_item.asn1_tree_element
+        dialog.tag_field.setText(
+            f"{str(tree_item.get_encode_tag())} ({str(hex(tree_item.get_encode_tag()))}):"\
+            f" {tree_item.get_tag_type()}"
+        )
+        dialog.tag_input.setText(str(tree_item.get_encode_tag()))
+        dialog.offset_field.setText(str(tree_item.get_offset()))
+        dialog.length_field.setText(str(tree_item.get_length()))
+
+        is_parrent = bool(tree_item.get_childs())
+        if is_parrent:
+            dialog.data_input.setDisabled(True)
+
+        if dialog.exec_() == QtWidgets.QDialog.Accepted:
+            if not is_parrent:
+                new_value = dialog.data_input.toPlainText()
+
+                if len(new_value.replace(' ', '')) % 2 != 0:
+                    QtWidgets.QMessageBox.critical(self, 'Ошибка редактирования', 'Не HEX вид. Не чётная длина', QtWidgets.QMessageBox.Ok)
+                    return
+
+                self.tree.edit_node(tree_item, new_value, True)
+
+        self.draw_tree()
 
     def delete_tree_item(self):
         cur_item = self.tree_widget.currentItem()
