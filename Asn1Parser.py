@@ -103,6 +103,19 @@ class Asn1Parser:
 
         return (offset, displayed_offset, tag_type, length, value, decoded_value, constructed, encode_info)
 
+    @staticmethod
+    def get_tag_info(tag: int):
+        class_ = tag & 0xC0
+        constructed = tag & 0x20
+
+        # Читаем номер тега
+        tag_number = tag & 0x1F
+        tag_class = ["Universal", "Application", "Context-specific", "Private"][
+            class_ >> 6
+        ]
+        tag_type = Asn1Parser.__get_tag_type(tag_class, tag_number)
+
+        return (tag_number, class_ >> 6, constructed, tag_type, tag_class)
 
     @staticmethod
     def encode(length: int, tag_number: int, class_: int, value=None, constructed=False) -> bytes:

@@ -16,6 +16,7 @@ class Asn1Tree:
 
         while offset < len(data):
             new_offset, displayed_offset, tag_type, length, value, decoded_value, __constructed, encode_info = Asn1Parser.decode(data, offset)
+            is_primitive = True if value is not None or tag_type == "OCTET STRING" else False
 
             new_element = Asn1TreeElement(
                 cur_elem,
@@ -24,6 +25,7 @@ class Asn1Tree:
                 length,
                 displayed_offset,
                 self.next_uid,
+                is_primitive,
                 *encode_info
             )
 
@@ -93,8 +95,8 @@ class Asn1Tree:
         offset_changes = 1 + element.get_length() + Asn1Parser.get_length_len(element.get_length())
         # print(offset_changes)
 
-        nodes_to_visit = [(self.root, 0)]
         was_element = False
+        nodes_to_visit = [(self.root, 0)]
 
         while nodes_to_visit:
             current_node, level = nodes_to_visit.pop(0)
@@ -115,15 +117,73 @@ class Asn1Tree:
                     nodes_to_visit.insert(0, (child, level + 1))
 
 
-    def add_node(self, element: Asn1TreeElement) -> None:
-        pass
+    def add_node(self, parrent: Asn1TreeElement, tag: str) -> None:
+        new_tag = int(tag, 16)
+        tag_number, class_, constucted, tag_type, tag_class = Asn1Parser.get_tag_info(new_tag)
+
+        if parrent.get_childs():
+            last_element = parrent.get_childs()[-1]
+        else:
+            last_element = parrent
+
+        new_offset = 1 + last_element.get_length() + last_element.get_offset() + Asn1Parser.get_length_len(last_element.get_length())
+
+        new_element = Asn1TreeElement(
+            parrent=parrent,
+            tag_type=tag_type,
+            length=0,
+            offset=new_offset,
+            uid=self.next_uid,
+            primitive= not bool(constucted),
+            encode_tag=new_tag,
+            encode_tag_number=tag_number,
+            encode_class=class_,
+            encode_offset=new_offset + len(tag)
+        )
+        self.next_uid += 1
+
+        parrent.add_child(new_element)
+
+        offset_changes = 2
+        additional_offset = 0
+
+        was_element = False
+        is_parrent = True
+        nodes_to_visit = [(self.root, 0)]
+
+        while nodes_to_visit:
+            current_node, level = nodes_to_visit.pop(0)
+
+            if current_node.get_uid() == self.next_uid - 1:
+                was_element = True
+                current_node.set_offset(current_node.get_offset() + additional_offset)
+                continue
+
+            if is_parrent:
+                new_length = current_node.get_length() + offset_changes
+                offset = Asn1Parser.get_length_len(current_node.get_length()) - Asn1Parser.get_length_len(new_length)
+                additional_offset += offset
+                current_node.set_length(new_length)
+            elif was_element:
+                current_node.set_offset(current_node.get_offset() + offset_changes + additional_offset)
+            print(current_node.get_decode_value(), is_parrent, was_element)
+            if current_node.get_uid() == parrent.get_uid():
+                is_parrent = False
+                print('aboba')
+
+            nodes_to_visit_tmp = list()
+            for child in (current_node.get_childs()):
+                nodes_to_visit_tmp.append((child, level + 1))
+                # nodes_to_visit.insert(0, (child, level + 1, is_parrent, was_element))
+            nodes_to_visit_tmp.extend(nodes_to_visit.copy())
+            nodes_to_visit = nodes_to_visit_tmp.copy()
 
     def edit_node(self, element: Asn1TreeElement, new_value: str, is_hex=False) -> None:
         old_length = element.get_length()
 
         if is_hex:
             new_encode_value = bytes.fromhex(new_value.replace(" ", ""))
-            value = Asn1Parser.decode_primitive_value(element.get_tag_type(), new_encode_value, len(new_encode_value))
+            new_value = Asn1Parser.decode_primitive_value(element.get_tag_type(), new_encode_value, len(new_encode_value))
         else:
             new_encode_value = Asn1Parser.encode_value(new_value, element.get_tag_type())
 
@@ -134,8 +194,8 @@ class Asn1Tree:
         offset_changes = element.get_length() - old_length +\
             Asn1Parser.get_length_len(element.get_length()) - Asn1Parser.get_length_len(old_length)
 
-        nodes_to_visit = [(self.root, 0)]
         was_element = False
+        nodes_to_visit = [(self.root, 0)]
 
         while nodes_to_visit:
             current_node, level = nodes_to_visit.pop(0)

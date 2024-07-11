@@ -1,19 +1,20 @@
 class Asn1TreeElement:
     def __init__(
             self,
-            parent=None,
-            decode_value=None,
-            encode_value=None,
+            parrent=None,
+            decode_value=0,
+            encode_value=0,
             tag_type=None,
             length=-1,
             offset=-1,
             uid=-1,
+            primitive=False,
             encode_tag=None,
             encode_tag_number=None,
             encode_class=None,
             encode_offset=None)-> None:
         
-        self.__parent = parent
+        self.__parrent = parrent
         self.__childs = list()
         self.__decode_value = decode_value
         self.__encode_value = encode_value
@@ -21,6 +22,7 @@ class Asn1TreeElement:
         self.__length = length
         self.__offset = offset
         self.__uid = uid
+        self.__is_primitive = primitive
 
         self.__encode_tag = encode_tag
         self.__encode_tag_number = encode_tag_number
@@ -50,7 +52,7 @@ class Asn1TreeElement:
         return self.__uid
 
     def get_parrent(self):
-        return self.__parent
+        return self.__parrent
     
     def get_childs(self):
         return self.__childs
@@ -75,3 +77,6 @@ class Asn1TreeElement:
 
     def set_encode_value(self, new_value):
         self.__encode_value = new_value
+
+    def is_primitive(self):
+        return self.__is_primitive

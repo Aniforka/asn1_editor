@@ -32,7 +32,7 @@ class MyTreeWidget(QTreeWidget):
         menu.addAction(self.action_delete)
 
         item = self.currentItem()
-        is_item_valid = len(item.asn1_tree_element.get_childs())
+        is_item_valid = not item.asn1_tree_element.is_primitive()
 
         # Управление состоянием действия "Создать"
         self.action_create.setEnabled(is_item_valid)

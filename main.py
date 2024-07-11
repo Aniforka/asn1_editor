@@ -122,11 +122,13 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
     def create_tree_item(self):
         dialog = EditDialog(self)
         dialog.data_input.setDisabled(True)
+        cur_item = self.tree_widget.currentItem()
 
         if dialog.exec_() == QtWidgets.QDialog.Accepted:
             tag = dialog.tag_input.text()
+            self.tree.add_node(cur_item.asn1_tree_element, tag)
 
-            print(f"Tag: {tag}\n")
+        self.draw_tree()
 
 
     def edit_tree_item(self):
