@@ -92,6 +92,9 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
         self.tree_widget.clear()
         self.tree_widget.setHeaderLabels([os.path.basename(self.cur_file)])
 
+        if self.tree.root is None:
+            return
+
         nodes_to_visit = [(self.tree.root, None)]
 
         while nodes_to_visit:

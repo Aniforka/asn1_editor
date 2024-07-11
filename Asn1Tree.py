@@ -83,11 +83,15 @@ class Asn1Tree:
         f_out.close()
 
     def remove_node(self, element: Asn1TreeElement) -> None:
-        offset_changes = 0
+        if (element.get_uid() == self.root.get_uid()):
+            del self.root
+            self.root = None
+            return
 
+        offset_changes = 0
     
         offset_changes = 1 + element.get_length() + Asn1Parser.get_length_len(element.get_length())
-        print(offset_changes)
+        # print(offset_changes)
 
         nodes_to_visit = [(self.root, 0)]
         was_element = False
@@ -105,18 +109,46 @@ class Asn1Tree:
 
             for child in reversed(current_node.get_childs()):
                 if child.get_uid() == element.get_uid():
-                    
                     current_node.get_childs().remove(element)
                     was_element = True
                 else:
                     nodes_to_visit.insert(0, (child, level + 1))
 
 
-    def add_node(element: Asn1TreeElement) -> None:
+    def add_node(self, element: Asn1TreeElement) -> None:
         pass
 
-    def edit_node(element: Asn1TreeElement) -> None:
-        pass
+    def edit_node(self, element: Asn1TreeElement, new_value: str) -> None:
+        old_length = element.get_length()
+
+        new_encode_value = Asn1Parser.encode_value(new_value, element.get_tag_type())
+        element.set_value(new_value)
+        element.set_length(len(new_encode_value))
+        element.set_encode_value(new_encode_value)
+
+        offset_changes = element.get_length() - old_length +\
+            Asn1Parser.get_length_len(element.get_length()) - Asn1Parser.get_length_len(old_length)
+
+        nodes_to_visit = [(self.root, 0)]
+        was_element = False
+
+        while nodes_to_visit:
+            current_node, level = nodes_to_visit.pop(0)
+
+            if was_element:
+                current_node.set_offset(current_node.get_offset() + offset_changes)
+            else:
+                new_length = current_node.get_length() + offset_changes
+                offset = Asn1Parser.get_length_len(current_node.get_length()) - Asn1Parser.get_length_len(new_length)
+                offset_changes += offset
+                current_node.set_length(new_length)
+
+            for child in reversed(current_node.get_childs()):
+                if child.get_uid() == element.get_uid():
+                    was_element = True
+                else:
+                    nodes_to_visit.insert(0, (child, level + 1))
+
 
     def get_root(self) -> Asn1TreeElement:
         return self.root

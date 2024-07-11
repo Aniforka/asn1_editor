@@ -69,3 +69,9 @@ class Asn1TreeElement:
 
     def set_length(self, new_length):
         self.__length = new_length
+
+    def set_value(self, new_value):
+        self.__decode_value = new_value
+
+    def set_encode_value(self, new_value):
+        self.__encode_value = new_value

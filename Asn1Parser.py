@@ -137,14 +137,14 @@ class Asn1Parser:
         if value is not None:
             tag_type = Asn1Parser.__get_tag_type(tag_class, tag_number)
             # print(tag_type)
-            encoded_value = Asn1Parser.__encode_value(value, tag_type)
+            encoded_value = Asn1Parser.encode_value(value, tag_type)
             encoded_data.extend(encoded_value)
 
         # print(encoded_data.hex().upper())
         return bytes(encoded_data)
 
     @staticmethod
-    def __encode_value(value, tag_type: str) -> bytes:
+    def encode_value(value, tag_type: str) -> bytes:
         """Кодирует значение в соответствии с типом тега."""
         if tag_type == "INTEGER":
             return int(value, 16).to_bytes((len(value) + 1) // 2, byteorder="big", signed=True)
