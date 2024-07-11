@@ -94,28 +94,51 @@ class Asn1Tree:
     
         offset_changes = 1 + element.get_length() + Asn1Parser.get_length_len(element.get_length())
         # print(offset_changes)
+        additional_offset = 0
 
         was_element = False
+        is_parrent = True
         nodes_to_visit = [(self.root, 0)]
 
         while nodes_to_visit:
             current_node, level = nodes_to_visit.pop(0)
 
-            if was_element:
-                current_node.set_offset(current_node.get_offset() - offset_changes)
-            else:
+            if current_node.get_uid() == element.get_uid():
+                was_element = True
+                current_node.get_parrent().get_childs().remove(element)
+                continue
+
+            print(is_parrent, was_element, current_node.get_decode_value(), offset_changes)
+
+            if self.__is_grand_parrent(current_node, element.get_uid()):
                 new_length = current_node.get_length() - offset_changes
                 offset = Asn1Parser.get_length_len(current_node.get_length()) - Asn1Parser.get_length_len(new_length)
-                offset_changes += offset
+                additional_offset += offset
                 current_node.set_length(new_length)
+            elif was_element:
+                current_node.set_offset(current_node.get_offset() - offset_changes - additional_offset)
+            else: 
+                current_node.set_offset(current_node.get_offset() - additional_offset)
+
+            if current_node.get_uid() == element.get_parrent().get_uid():
+                is_parrent = False
 
             for child in reversed(current_node.get_childs()):
-                if child.get_uid() == element.get_uid():
-                    current_node.get_childs().remove(element)
-                    was_element = True
-                else:
-                    nodes_to_visit.insert(0, (child, level + 1))
+                nodes_to_visit.insert(0, (child, level + 1))
 
+    def __is_grand_parrent(self, current_node: Asn1TreeElement, uid: int):
+        nodes_to_visit = [current_node]
+
+        while nodes_to_visit:
+            current_node = nodes_to_visit.pop(0)
+
+            if current_node.get_uid() == uid:
+                return True
+
+            for child in reversed(current_node.get_childs()):
+                nodes_to_visit.insert(0, child)
+
+        return False
 
     def add_node(self, parrent: Asn1TreeElement, tag: str) -> None:
         new_tag = int(tag, 16)
@@ -199,6 +222,10 @@ class Asn1Tree:
         while nodes_to_visit:
             current_node, level = nodes_to_visit.pop(0)
 
+            if current_node.get_uid() == element.get_uid():
+                was_element = True
+                continue
+
             if was_element:
                 current_node.set_offset(current_node.get_offset() + offset_changes)
             else:
@@ -208,10 +235,7 @@ class Asn1Tree:
                 current_node.set_length(new_length)
 
             for child in reversed(current_node.get_childs()):
-                if child.get_uid() == element.get_uid():
-                    was_element = True
-                else:
-                    nodes_to_visit.insert(0, (child, level + 1))
+                nodes_to_visit.insert(0, (child, level + 1))
 
 
     def get_root(self) -> Asn1TreeElement:
