@@ -4,7 +4,7 @@ from Asn1TreeElement import Asn1TreeElement
 class Asn1Tree:
     def __init__(self) -> None:
         self.root = None
-        self.count_of_elements = 0
+        self.next_uid = 0
 
     def import_from_file(self, file_path: str) -> None:
         with open(file_path, "rb") as f:
@@ -23,7 +23,7 @@ class Asn1Tree:
                 value, tag_type,
                 length,
                 displayed_offset,
-                self.count_of_elements,
+                self.next_uid,
                 *encode_info
             )
 
@@ -31,7 +31,7 @@ class Asn1Tree:
             if cur_elem is not None:
                 cur_elem.add_child(new_element)
 
-            self.count_of_elements += 1
+            self.next_uid += 1
             cur_elem = new_element
 
             if self.root is None:
@@ -112,7 +112,10 @@ class Asn1Tree:
                     nodes_to_visit.insert(0, (child, level + 1))
 
 
-    def add_node(element: Asn1TreeElement, uid: int) -> None:
+    def add_node(element: Asn1TreeElement) -> None:
+        pass
+
+    def edit_node(element: Asn1TreeElement) -> None:
         pass
 
     def get_root(self) -> Asn1TreeElement:

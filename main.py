@@ -5,6 +5,7 @@ import os
 from Asn1Tree import Asn1Tree
 from MyTreeWidget import MyTreeWidget
 from MyTreeWidgetItem import MyTreeWidgetItem
+from EditDialog import EditDialog
 
 class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого интерфейса программы
     file_filter = (
@@ -111,10 +112,37 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
         self.tree_widget.expandAll()
 
     def create_tree_item(self):
-        pass
+        dialog = EditDialog(self)
+        dialog.data_input.setDisabled(True)
+
+        if dialog.exec_() == QtWidgets.QDialog.Accepted:
+            tag = dialog.tag_input.text()
+
+            print(f"Tag: {tag}\n")
 
     def edit_tree_item(self):
-        pass
+        dialog = EditDialog(self)
+        dialog.tag_input.setDisabled(True)
+
+        cur_item = self.tree_widget.currentItem()
+
+        tree_item = cur_item.asn1_tree_element
+        dialog.tag_field.setText(
+            f"{str(tree_item.get_encode_tag())} ({str(hex(tree_item.get_encode_tag()))}):"\
+            f" {tree_item.get_tag_type()}"
+        )
+        dialog.tag_input.setText(str(tree_item.get_encode_tag()))
+        dialog.offset_field.setText(str(tree_item.get_offset()))
+        dialog.length_field.setText(str(tree_item.get_length()))
+
+        is_parrent = bool(tree_item.get_childs())
+        if is_parrent:
+            dialog.data_input.setDisabled(True)
+
+        if dialog.exec_() == QtWidgets.QDialog.Accepted:
+            if not is_parrent:
+                pass
+
 
     def delete_tree_item(self):
         cur_item = self.tree_widget.currentItem()
