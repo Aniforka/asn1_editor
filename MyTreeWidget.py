@@ -1,8 +1,13 @@
 from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem, QMenu, QAction, QApplication
+from PyQt5.QtCore import pyqtSignal
 
 from Asn1Tree import Asn1Tree
 
 class MyTreeWidget(QTreeWidget):
+    create_item_signal = pyqtSignal()  # Сигнал о создании
+    edit_item_signal = pyqtSignal()  # Сигнал об изменении
+    delete_item_signal = pyqtSignal()  # Сигнал об удалении
+
     def __init__(self):
         super().__init__()
 
@@ -32,13 +37,11 @@ class MyTreeWidget(QTreeWidget):
         menu.exec_(event.globalPos())
 
     def create_item(self):
-        item = self.currentItem()
+        self.create_item_signal.emit()
 
     def edit_item(self):
-        item = self.currentItem()
-        print(f"Редактируем элемент: {item.text(0)}")
+        self.edit_item_signal.emit()
 
     def delete_item(self):
-        item = self.currentItem()
-        print(f"Удаляем элемент: {item.text(0)}")
+        self.delete_item_signal.emit()
 

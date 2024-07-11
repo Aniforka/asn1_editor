@@ -87,7 +87,7 @@ class Asn1Parser:
             else:
                 if not "Private" in tmp_tag_type:
                     constructed = True
-                    return (offset, displayed_offset, tag_type, length, length_len, value, decoded_value, constructed, encode_info)
+                    return (offset, displayed_offset, tag_type, length, value, decoded_value, constructed, encode_info)
         # костыль
 
 
@@ -101,7 +101,7 @@ class Asn1Parser:
 
             offset += length
 
-        return (offset, displayed_offset, tag_type, length, length_len, value, decoded_value, constructed, encode_info)
+        return (offset, displayed_offset, tag_type, length, value, decoded_value, constructed, encode_info)
 
 
     @staticmethod
@@ -171,6 +171,10 @@ class Asn1Parser:
         else:
             length_bytes = length.to_bytes((length.bit_length() + 7) // 8, byteorder="big")
             return bytes([0x80 | len(length_bytes)]) + length_bytes
+        
+    @staticmethod
+    def get_length_len(length: int) -> int:
+        return len(Asn1Parser.__encode_length(length))
 
     def is_valid_asn1(data: bytes) -> bool:
         """

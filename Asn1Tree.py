@@ -15,14 +15,13 @@ class Asn1Tree:
         cur_elem = None
 
         while offset < len(data):
-            new_offset, displayed_offset, tag_type, length, length_len, value, decoded_value, __constructed, encode_info = Asn1Parser.decode(data, offset)
+            new_offset, displayed_offset, tag_type, length, value, decoded_value, __constructed, encode_info = Asn1Parser.decode(data, offset)
 
             new_element = Asn1TreeElement(
                 cur_elem,
                 decoded_value,
                 value, tag_type,
                 length,
-                length_len,
                 displayed_offset,
                 self.count_of_elements,
                 *encode_info
@@ -83,8 +82,35 @@ class Asn1Tree:
 
         f_out.close()
 
-    def remove_node(self, uid: int) -> None:
-        pass
+    def remove_node(self, element: Asn1TreeElement) -> None:
+        offset_changes = 0
+
+    
+        offset_changes = 1 + element.get_length() + Asn1Parser.get_length_len(element.get_length())
+        print(offset_changes)
+
+        nodes_to_visit = [(self.root, 0)]
+        was_element = False
+
+        while nodes_to_visit:
+            current_node, level = nodes_to_visit.pop(0)
+
+            if was_element:
+                current_node.set_offset(current_node.get_offset() - offset_changes)
+            else:
+                new_length = current_node.get_length() - offset_changes
+                offset = Asn1Parser.get_length_len(current_node.get_length()) - Asn1Parser.get_length_len(new_length)
+                offset_changes += offset
+                current_node.set_length(new_length)
+
+            for child in reversed(current_node.get_childs()):
+                if child.get_uid() == element.get_uid():
+                    
+                    current_node.get_childs().remove(element)
+                    was_element = True
+                else:
+                    nodes_to_visit.insert(0, (child, level + 1))
+
 
     def add_node(element: Asn1TreeElement, uid: int) -> None:
         pass

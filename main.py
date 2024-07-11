@@ -7,12 +7,30 @@ from MyTreeWidget import MyTreeWidget
 from MyTreeWidgetItem import MyTreeWidgetItem
 
 class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого интерфейса программы
+    file_filter = (
+        "Сертификаты (*.cer *.crl);; "  # Сертификаты и списки отзыва сертификатов
+        "Запросы на сертификаты (*.p10);; "  # Запросы на сертификаты
+        "Файлы подписи (*.p7s);; "  # Файлы подписи
+        "Все файлы (*)"  # На всякий случай, для отображения всех файлов 
+    )
+
+    # file_filter = (
+    #     "Сертификаты (*.cer *.crt *.der);; "
+    #     "Запросы на сертификаты (*.csr *.p10);; "
+    #     "Закрытые ключи (*.key *.pem);; "
+    #     "Списки отозванных сертификатов (*.crl);; "
+    #     "Файлы PKCS#7 (*.p7b *.p7c *.p7m *.p7r *.p7s);; "
+    #     "Файлы PKCS#12 (*.p12 *.pfx);; "
+    #     "Все файлы (*)" 
+    # )
+
+
     def __init__(self):
         super(Ui, self).__init__()
         uic.loadUi('ui/MainWindow.ui', self)
 
-        self.treeWidget = MyTreeWidget()
-        self.Layout_Tree.addWidget(self.treeWidget)
+        self.tree_widget = MyTreeWidget()
+        self.Layout_Tree.addWidget(self.tree_widget)
 
         self.tree = Asn1Tree()
         self.__init_vars()
@@ -23,25 +41,13 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
         self.file_save_as_action.triggered.connect(self.save_file_as)
         self.clear_all_action.triggered.connect(self.clear_all)
 
-        self.file_filter = (
-            "Сертификаты (*.cer *.crl);; "  # Сертификаты и списки отзыва сертификатов
-            "Запросы на сертификаты (*.p10);; "  # Запросы на сертификаты
-            "Файлы подписи (*.p7s);; "  # Файлы подписи
-            "Все файлы (*)"  # На всякий случай, для отображения всех файлов 
-        )
+        self.tree_widget.create_item_signal.connect(self.create_tree_item)
+        self.tree_widget.edit_item_signal.connect(self.edit_tree_item)
+        self.tree_widget.delete_item_signal.connect(self.delete_tree_item)
 
-        # self.file_filter = (
-        #     "Сертификаты (*.cer *.crt *.der);; "
-        #     "Запросы на сертификаты (*.csr *.p10);; "
-        #     "Закрытые ключи (*.key *.pem);; "
-        #     "Списки отозванных сертификатов (*.crl);; "
-        #     "Файлы PKCS#7 (*.p7b *.p7c *.p7m *.p7r *.p7s);; "
-        #     "Файлы PKCS#12 (*.p12 *.pfx);; "
-        #     "Все файлы (*)" 
-        # )
 
     def __init_vars(self):
-        self.treeWidget.clear()
+        self.tree_widget.clear()
         del self.tree
         self.tree = Asn1Tree()
         self.cur_file = None
@@ -79,8 +85,8 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
             return
 
     def draw_tree(self):
-        self.treeWidget.clear()
-        self.treeWidget.setHeaderLabels([os.path.basename(self.cur_file)])
+        self.tree_widget.clear()
+        self.tree_widget.setHeaderLabels([os.path.basename(self.cur_file)])
 
         nodes_to_visit = [(self.tree.root, None)]
 
@@ -95,14 +101,27 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
             item.setText(0, item_text)
 
             if parent_item is None:
-                self.treeWidget.addTopLevelItem(item)
+                self.tree_widget.addTopLevelItem(item)
             else:
                 parent_item.addChild(item)
 
             for child in reversed(current_node.get_childs()):
                 nodes_to_visit.insert(0, (child, item))
 
-        self.treeWidget.expandAll()
+        self.tree_widget.expandAll()
+
+    def create_tree_item(self):
+        pass
+
+    def edit_tree_item(self):
+        pass
+
+    def delete_tree_item(self):
+        cur_item = self.tree_widget.currentItem()
+
+        self.tree.remove_node(cur_item.asn1_tree_element)
+        self.draw_tree()
+
 
     def clear_all(self):
         self.__init_vars()

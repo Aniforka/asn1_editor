@@ -6,7 +6,6 @@ class Asn1TreeElement:
             encode_value=None,
             tag_type=None,
             length=-1,
-            length_len=-1,
             offset=-1,
             uid=-1,
             encode_tag=None,
@@ -20,7 +19,6 @@ class Asn1TreeElement:
         self.__encode_value = encode_value
         self.__tag_type = tag_type
         self.__length = length
-        self.__length_len = length_len
         self.__offset = offset
         self.__uid = uid
 
@@ -35,9 +33,6 @@ class Asn1TreeElement:
 
     def get_length(self) -> int:
         return self.__length
-    
-    def get_length_len(self) -> int:
-        return self.__length_len
 
     def get_offset(self) -> int:
         return self.__offset
@@ -68,3 +63,9 @@ class Asn1TreeElement:
     
     def get_encode_class(self):
         return self.__encode_class
+
+    def set_offset(self, new_offset):
+        self.__offset = new_offset
+
+    def set_length(self, new_length):
+        self.__length = new_length
