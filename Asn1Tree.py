@@ -191,11 +191,12 @@ class Asn1Tree:
         old_length = element.get_length()
 
         if is_hex:
-            new_encode_value = bytes.fromhex(new_value.replace(" ", ""))
+            new_value = new_value.replace(" ", "")
+            new_encode_value = bytes.fromhex()
             new_value = Asn1Parser.decode_primitive_value(element.get_tag_type(), new_encode_value, len(new_encode_value))
         else:
             new_encode_value = Asn1Parser.encode_value(new_value, element.get_tag_type())
-
+        print(new_value, new_encode_value)
         element.set_value(new_value)
         element.set_length(len(new_encode_value))
         element.set_encode_value(new_encode_value)

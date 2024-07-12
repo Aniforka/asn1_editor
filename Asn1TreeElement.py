@@ -2,7 +2,7 @@ class Asn1TreeElement:
     def __init__(
             self,
             parrent=None,
-            decode_value=0,
+            decode_value='0',
             encode_value=0,
             tag_type=None,
             length=-1,

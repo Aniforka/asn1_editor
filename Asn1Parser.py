@@ -147,9 +147,10 @@ class Asn1Parser:
 
         # print(Asn1Parser.__get_tag_type(tag_class, tag_number), tag_class, tag_number, class_)
 
-        if value is not None:
+        if value is not None and length:
             tag_type = Asn1Parser.__get_tag_type(tag_class, tag_number)
             # print(tag_type)
+            print(value, tag_type, type(value))
             encoded_value = Asn1Parser.encode_value(value, tag_type)
             encoded_data.extend(encoded_value)
 
@@ -160,7 +161,7 @@ class Asn1Parser:
     def encode_value(value, tag_type: str) -> bytes:
         """Кодирует значение в соответствии с типом тега."""
         if tag_type == "INTEGER":
-            return int(value, 16).to_bytes((len(value) + 1) // 2, byteorder="big", signed=True)
+            return bytes.fromhex(value)
         elif tag_type == "OCTET STRING":
             return bytes.fromhex(value)
         elif tag_type == "OBJECT IDENTIFIER":
