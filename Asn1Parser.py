@@ -144,13 +144,11 @@ class Asn1Parser:
         encoded_data = bytearray()
         encoded_data.append(tag)
         encoded_data.extend(Asn1Parser.__encode_length(length))
-
         # print(Asn1Parser.__get_tag_type(tag_class, tag_number), tag_class, tag_number, class_)
 
         if value is not None and length:
             tag_type = Asn1Parser.__get_tag_type(tag_class, tag_number)
             # print(tag_type)
-            print(value, tag_type, type(value))
             encoded_value = Asn1Parser.encode_value(value, tag_type)
             encoded_data.extend(encoded_value)
 
@@ -161,8 +159,11 @@ class Asn1Parser:
     def encode_value(value, tag_type: str) -> bytes:
         """Кодирует значение в соответствии с типом тега."""
         if tag_type == "INTEGER":
+            value = value.replace(" ", '')
+            value = (len(value) % 2 != 0) * '0' + value
             return bytes.fromhex(value)
         elif tag_type == "OCTET STRING":
+            value = value.replace(" ", '')
             return bytes.fromhex(value)
         elif tag_type == "OBJECT IDENTIFIER":
             # print(value)
@@ -175,6 +176,7 @@ class Asn1Parser:
         elif tag_type == "GeneralizedTime":
             return value.encode("ascii")
         else:
+            value = value.replace(" ", '')
             return bytes.fromhex(value)
 
     @staticmethod
