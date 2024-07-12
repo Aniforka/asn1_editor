@@ -27,7 +27,7 @@
      </layout>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="Layout_Tree"/>
+     <layout class="QVBoxLayout" name="layout_Tree"/>
     </item>
    </layout>
   </widget>

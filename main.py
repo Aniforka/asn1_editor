@@ -31,7 +31,7 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
         uic.loadUi('ui/MainWindow.ui', self)
 
         self.tree_widget = MyTreeWidget()
-        self.Layout_Tree.addWidget(self.tree_widget)
+        self.layout_Tree.addWidget(self.tree_widget)
 
         self.tree = Asn1Tree()
         self.__init_vars()
