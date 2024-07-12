@@ -23,6 +23,8 @@ class MyTreeWidget(QTreeWidget):
         self.action_edit_hex.triggered.connect(self.edit_hex_item)
         self.action_delete.triggered.connect(self.delete_item)
 
+        self.itemDoubleClicked.connect(self.on_item_double_clicked)
+
     def contextMenuEvent(self, event):
         # Создаем контекстное меню
         menu = QMenu(self)
@@ -52,3 +54,5 @@ class MyTreeWidget(QTreeWidget):
     def delete_item(self):
         self.delete_item_signal.emit()
 
+    def on_item_double_clicked(self, item, column):
+        self.edit_item_signal.emit()
