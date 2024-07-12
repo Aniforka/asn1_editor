@@ -249,9 +249,9 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
 
         if dialog.exec_() == QtWidgets.QDialog.Accepted:
             if not is_parrent:
-                new_value = dialog.data_input.toPlainText()
+                new_value = dialog.data_input.toPlainText().replace(' ', '')
 
-                if len(new_value.replace(' ', '')) % 2 != 0:
+                if len(new_value) % 2 != 0:
                     QtWidgets.QMessageBox.critical(self, 'Ошибка редактирования', 'Не HEX вид. Не чётная длина', QtWidgets.QMessageBox.Ok)
                     return
 

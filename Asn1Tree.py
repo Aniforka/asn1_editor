@@ -114,14 +114,24 @@ class Asn1Tree:
 
 
     def get_full_encoded_item(self, element: Asn1TreeElement) -> bytes:
-        constructed = True if not element.is_primitive() and element.get_tag_type() != "OCTET STRING" else False
-        answer = Asn1Parser.encode(
-            element.get_length(),
-            element.get_encode_tag_number(),
-            element.get_encode_class(),
-            element.get_decode_value(),
-            constructed
-        )
+        nodes_to_visit = [element]
+        answer = bytes()
+
+        while nodes_to_visit:
+            current_node = nodes_to_visit.pop(0)
+
+            constructed = True if not current_node.is_primitive() and current_node.get_tag_type() != "OCTET STRING" else False
+
+            answer += Asn1Parser.encode(
+                current_node.get_length(),
+                current_node.get_encode_tag_number(),
+                current_node.get_encode_class(),
+                current_node.get_decode_value(),
+                constructed
+            )
+
+            for child in reversed(current_node.get_childs()):
+                nodes_to_visit.insert(0, child)
 
         return answer
 
