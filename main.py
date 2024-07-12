@@ -146,6 +146,12 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
         dialog.offset_field.setText(str(tree_item.get_offset()))
         dialog.length_field.setText(str(tree_item.get_length()))
 
+        dialog.data_input.setPlainText(tree_item.get_decode_value())
+
+        cursor = dialog.data_input.textCursor()
+        cursor.movePosition(cursor.End)
+        dialog.data_input.setTextCursor(cursor)
+
         is_parrent = bool(tree_item.get_childs())
         if is_parrent:
             dialog.data_input.setDisabled(True)
@@ -171,6 +177,12 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
         dialog.tag_input.setText(str(tree_item.get_encode_tag()))
         dialog.offset_field.setText(str(tree_item.get_offset()))
         dialog.length_field.setText(str(tree_item.get_length()))
+
+        dialog.data_input.setPlainText(tree_item.get_encode_value().hex().upper())
+
+        cursor = dialog.data_input.textCursor()
+        cursor.movePosition(cursor.End)
+        dialog.data_input.setTextCursor(cursor)
 
         is_parrent = bool(tree_item.get_childs())
         if is_parrent:
