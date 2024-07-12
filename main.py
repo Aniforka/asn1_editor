@@ -228,7 +228,15 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
 
 
     def clear_all(self):
-        self.__init_vars()
+        result = QtWidgets.QMessageBox.question(
+            self,
+            'Подтверждение',
+            "Вы действительно хотите очистить всё?",
+            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No
+        )
+
+        if result == QtWidgets.QMessageBox.Yes:
+            self.__init_vars()
 
 
 if __name__ == "__main__":

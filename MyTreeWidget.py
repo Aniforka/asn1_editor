@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem, QMenu, QAction, QApplication
+from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem, QMenu, QAction, QApplication, QMessageBox
 from PyQt5.QtCore import pyqtSignal
 
 from Asn1Tree import Asn1Tree
@@ -52,7 +52,11 @@ class MyTreeWidget(QTreeWidget):
         self.edit_hex_item_signal.emit()
 
     def delete_item(self):
-        self.delete_item_signal.emit()
+        result = QMessageBox.question(self, 'Подтверждение', "Вы действительно хотите удалить элемент?", QMessageBox.Yes | QMessageBox.No)
+
+        if result == QMessageBox.Yes:
+            self.delete_item_signal.emit()
+        
 
     def on_item_double_clicked(self, item, column):
         self.edit_item_signal.emit()
