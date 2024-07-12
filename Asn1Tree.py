@@ -84,6 +84,33 @@ class Asn1Tree:
 
         f_out.close()
 
+    def export_node_to_file(self, file_path: str, element: Asn1TreeElement) -> None:
+        f_out = open(file_path, "wb")
+        nodes_to_visit = [(element, 0)]
+
+        while nodes_to_visit:
+            current_node, level = nodes_to_visit.pop(0)
+
+            # if current_node.get_tag_type() == "OBJECT IDENTIFIER":
+            # print('aboba',current_node.get_offset(), current_node.get_encode_tag_number())
+
+            constructed = True if current_node.get_childs() and current_node.get_tag_type() != "OCTET STRING" else False
+
+            f_out.write(
+                Asn1Parser.encode(
+                    current_node.get_length(),
+                    current_node.get_encode_tag_number(),
+                    current_node.get_encode_class(),
+                    current_node.get_decode_value(),
+                    constructed
+                )
+            )
+
+            for child in reversed(current_node.get_childs()):
+                nodes_to_visit.insert(0, (child, level + 1))
+
+        f_out.close()
+
     def remove_node(self, element: Asn1TreeElement) -> None:
         if (element.get_uid() == self.root.get_uid()):
             del self.root

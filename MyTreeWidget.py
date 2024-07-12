@@ -5,8 +5,9 @@ from Asn1Tree import Asn1Tree
 
 class MyTreeWidget(QTreeWidget):
     create_item_signal = pyqtSignal()  # Сигнал о создании
+    action_save_node_as_signal = pyqtSignal() # Сигнал о сохранении узла
     edit_item_signal = pyqtSignal()  # Сигнал об изменении
-    edit_hex_item_signal = pyqtSignal()  # Сигнал об изменении
+    edit_hex_item_signal = pyqtSignal()  # Сигнал об изменении (hex)
     delete_item_signal = pyqtSignal()  # Сигнал об удалении
 
     def __init__(self):
@@ -14,11 +15,13 @@ class MyTreeWidget(QTreeWidget):
 
         # Создаем действия для контекстного меню
         self.action_create = QAction("Создать", self)
+        self.action_save_node_as = QAction("Сохранить узел как...", self)
         self.action_edit = QAction("Редактировать", self)
         self.action_edit_hex = QAction("Редактировать в HEX", self)
         self.action_delete = QAction("Удалить", self)
 
         self.action_create.triggered.connect(self.create_item)
+        self.action_save_node_as.triggered.connect(self.save_node_as)
         self.action_edit.triggered.connect(self.edit_item)
         self.action_edit_hex.triggered.connect(self.edit_hex_item)
         self.action_delete.triggered.connect(self.delete_item)
@@ -29,6 +32,7 @@ class MyTreeWidget(QTreeWidget):
         # Создаем контекстное меню
         menu = QMenu(self)
         menu.addAction(self.action_create)
+        menu.addAction(self.action_save_node_as)
         menu.addAction(self.action_edit)
         menu.addAction(self.action_edit_hex)
         menu.addAction(self.action_delete)
@@ -44,6 +48,9 @@ class MyTreeWidget(QTreeWidget):
 
     def create_item(self):
         self.create_item_signal.emit()
+
+    def save_node_as(self):
+        self.action_save_node_as_signal.emit()
 
     def edit_item(self):
         self.edit_item_signal.emit()

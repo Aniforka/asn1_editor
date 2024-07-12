@@ -44,6 +44,7 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
         self.clear_all_action.triggered.connect(self.clear_all)
 
         self.tree_widget.create_item_signal.connect(self.create_tree_item)
+        self.tree_widget.action_save_node_as_signal.connect(self.save_node_as)
         self.tree_widget.edit_item_signal.connect(self.edit_tree_item)
         self.tree_widget.edit_hex_item_signal.connect(self.edit_hex_tree_item)
         self.tree_widget.delete_item_signal.connect(self.delete_tree_item)
@@ -149,6 +150,25 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
             self.tree.add_node(cur_item.asn1_tree_element, tag)
 
         self.draw_tree()
+
+    def save_node_as(self):
+        cur_item = self.tree_widget.currentItem()
+
+        if self.tree.get_root() is not None:
+            file = QtWidgets.QFileDialog.getSaveFileName(self,'Сохранение', self.cur_file, self.file_filter)
+            if file:
+                try:
+                    self.tree.export_node_to_file(file[0], cur_item.asn1_tree_element)
+                except Exception as exp:
+                    QtWidgets.QMessageBox.critical(self, 'Ошибка сохранения', 'Не удалось сохранить файл', QtWidgets.QMessageBox.Ok)
+                    print(exp)
+                    return
+            else:
+                QtWidgets.QMessageBox.critical(self, 'Ошибка сохранения', 'Файл для сохранения не указан', QtWidgets.QMessageBox.Ok)
+                return
+        else:
+            QtWidgets.QMessageBox.critical(self, 'Ошибка сохранения', 'Нет данных для сохранения', QtWidgets.QMessageBox.Ok)
+            return
 
 
     def edit_tree_item(self):
