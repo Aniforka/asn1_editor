@@ -148,7 +148,13 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
 
         if dialog.exec_() == QtWidgets.QDialog.Accepted:
             tag = dialog.tag_input.text()
-            self.tree.add_node(cur_item.asn1_tree_element, tag)
+
+            try:
+                self.tree.add_node(cur_item.asn1_tree_element, tag)
+            except Exception as exp:
+                QtWidgets.QMessageBox.critical(self, 'Ошибка создания', 'Не получилось создать элемент', QtWidgets.QMessageBox.Ok)
+                print(exp)
+                return
 
         self.draw_tree()
 
@@ -201,9 +207,16 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
         if dialog.exec_() == QtWidgets.QDialog.Accepted:
             if not is_parrent:
                 new_value = dialog.data_input.toPlainText()
-                self.tree.edit_node(tree_item, new_value)
+
+                try:
+                    self.tree.edit_node(tree_item, new_value)
+                except Exception as exp:
+                    QtWidgets.QMessageBox.critical(self, 'Ошибка изменения', 'Не получилось изменить элемент', QtWidgets.QMessageBox.Ok)
+                    print(exp)
+                    return
 
         self.draw_tree()
+
 
     def edit_hex_tree_item(self):
         dialog = EditDialog(self)
@@ -238,14 +251,27 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
                     QtWidgets.QMessageBox.critical(self, 'Ошибка редактирования', 'Не HEX вид. Не чётная длина', QtWidgets.QMessageBox.Ok)
                     return
 
-                self.tree.edit_node(tree_item, new_value, True)
+                try:
+                    self.tree.edit_node(tree_item, new_value, True)
+                except Exception as exp:
+                    QtWidgets.QMessageBox.critical(self, 'Ошибка изменения', 'Не получилось изменить элемент', QtWidgets.QMessageBox.Ok)
+                    print(exp)
+                    return
+
 
         self.draw_tree()
 
 
     def copy_item_to_clipboard(self):
         cur_item = self.tree_widget.currentItem()
-        value = cur_item.asn1_tree_element.get_encode_value()
+    
+        try:
+            value = self.tree.get_full_encoded_item(cur_item.asn1_tree_element)
+        except Exception as exp:
+            QtWidgets.QMessageBox.critical(self, 'Ошибка сохранения', 'Не получилось закодировать элемент', QtWidgets.QMessageBox.Ok)
+            print(exp)
+            return
+
         clipboard = app.clipboard()
         clipboard.setText(value.hex().upper())
 
@@ -253,7 +279,13 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
     def delete_tree_item(self):
         cur_item = self.tree_widget.currentItem()
 
-        self.tree.remove_node(cur_item.asn1_tree_element)
+        try:
+            self.tree.remove_node(cur_item.asn1_tree_element)
+        except Exception as exp:
+            QtWidgets.QMessageBox.critical(self, 'Ошибка удаления', 'Не удалить элемент', QtWidgets.QMessageBox.Ok)
+            print(exp)
+            return
+
         self.draw_tree()
 
 

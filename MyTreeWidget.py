@@ -31,6 +31,7 @@ class MyTreeWidget(QTreeWidget):
 
         self.itemDoubleClicked.connect(self.on_item_double_clicked)
 
+
     def contextMenuEvent(self, event):
         # Создаем контекстное меню
         menu = QMenu(self)
@@ -50,6 +51,7 @@ class MyTreeWidget(QTreeWidget):
         # Отображаем меню на позиции курсора
         menu.exec_(event.globalPos())
 
+
     def create_item(self):
         self.create_item_signal.emit()
 
@@ -64,6 +66,7 @@ class MyTreeWidget(QTreeWidget):
 
     def copy_item(self):
         self.copy_item_signal.emit()
+
 
     def delete_item(self):
         result = QMessageBox.question(self, 'Подтверждение', "Вы действительно хотите удалить элемент?", QMessageBox.Yes | QMessageBox.No)

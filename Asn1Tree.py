@@ -84,6 +84,7 @@ class Asn1Tree:
 
         f_out.close()
 
+
     def export_node_to_file(self, file_path: str, element: Asn1TreeElement) -> None:
         f_out = open(file_path, "wb")
         nodes_to_visit = [(element, 0)]
@@ -94,7 +95,7 @@ class Asn1Tree:
             # if current_node.get_tag_type() == "OBJECT IDENTIFIER":
             # print('aboba',current_node.get_offset(), current_node.get_encode_tag_number())
 
-            constructed = True if current_node.get_childs() and current_node.get_tag_type() != "OCTET STRING" else False
+            constructed = True if not current_node.is_primitive() and current_node.get_tag_type() != "OCTET STRING" else False
 
             f_out.write(
                 Asn1Parser.encode(
@@ -110,6 +111,20 @@ class Asn1Tree:
                 nodes_to_visit.insert(0, (child, level + 1))
 
         f_out.close()
+
+
+    def get_full_encoded_item(self, element: Asn1TreeElement) -> bytes:
+        constructed = True if not element.is_primitive() and element.get_tag_type() != "OCTET STRING" else False
+        answer = Asn1Parser.encode(
+            element.get_length(),
+            element.get_encode_tag_number(),
+            element.get_encode_class(),
+            element.get_decode_value(),
+            constructed
+        )
+
+        return answer
+
 
     def remove_node(self, element: Asn1TreeElement) -> None:
         if (element.get_uid() == self.root.get_uid()):
@@ -147,6 +162,7 @@ class Asn1Tree:
             for child in reversed(current_node.get_childs()):
                 nodes_to_visit.insert(0, child)
 
+
     def __is_grand_parrent(self, current_node: Asn1TreeElement, uid: int):
         nodes_to_visit = [current_node]
 
@@ -160,6 +176,7 @@ class Asn1Tree:
                 nodes_to_visit.insert(0, child)
 
         return False
+
 
     def add_node(self, parrent: Asn1TreeElement, tag: str) -> None:
         new_tag = int(tag, 16)
@@ -260,7 +277,8 @@ class Asn1Tree:
 
     def get_root(self) -> Asn1TreeElement:
         return self.root
-    
+
+
     def __repr__(self) -> str:
         answer = ""
 

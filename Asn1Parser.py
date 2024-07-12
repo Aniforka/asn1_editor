@@ -90,8 +90,6 @@ class Asn1Parser:
                     return (offset, displayed_offset, tag_type, length, value, decoded_value, constructed, encode_info)
         # костыль
 
-
-
         # Обработка значения
         if not constructed:
             # Декодируем значение для primitive типов
@@ -102,6 +100,7 @@ class Asn1Parser:
             offset += length
 
         return (offset, displayed_offset, tag_type, length, value, decoded_value, constructed, encode_info)
+
 
     @staticmethod
     def get_tag_info(tag: int):
@@ -116,6 +115,7 @@ class Asn1Parser:
         tag_type = Asn1Parser.__get_tag_type(tag_class, tag_number)
 
         return (tag_number, class_ >> 6, constructed, tag_type, tag_class)
+
 
     @staticmethod
     def encode(length: int, tag_number: int, class_: int, value=None, constructed=False) -> bytes:
@@ -155,6 +155,7 @@ class Asn1Parser:
         # print(encoded_data.hex().upper())
         return bytes(encoded_data)
 
+
     @staticmethod
     def encode_value(value, tag_type: str) -> bytes:
         """Кодирует значение в соответствии с типом тега."""
@@ -179,6 +180,7 @@ class Asn1Parser:
             value = value.replace(" ", '')
             return bytes.fromhex(value)
 
+
     @staticmethod
     def __encode_length(length: int) -> bytes:
         """Кодирует длину значения."""
@@ -187,10 +189,12 @@ class Asn1Parser:
         else:
             length_bytes = length.to_bytes((length.bit_length() + 7) // 8, byteorder="big")
             return bytes([0x80 | len(length_bytes)]) + length_bytes
-        
+
+
     @staticmethod
     def get_length_len(length: int) -> int:
         return len(Asn1Parser.__encode_length(length))
+
 
     def is_valid_asn1(data: bytes) -> bool:
         """
@@ -328,6 +332,7 @@ class Asn1Parser:
         
     #     return True
 
+
     @staticmethod
     def decode_primitive_value(tag_type: str, value, length: int):
         """Декодирует значение примитивного типа ASN.1."""
@@ -358,6 +363,7 @@ class Asn1Parser:
             except ValueError:
                 return f"Invalid GeneralizedTime: {value.hex()}"
         return value.hex().upper()  # По умолчанию возвращаем шестнадцатеричное представление
+
 
     @staticmethod
     def __get_tag_type(tag_class: str, tag_number: int) -> str:
