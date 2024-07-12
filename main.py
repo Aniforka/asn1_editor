@@ -186,6 +186,8 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
         cur_item = self.tree_widget.currentItem()
 
         tree_item = cur_item.asn1_tree_element
+        is_parrent = bool(tree_item.get_childs())
+
         dialog.tag_field.setText(
             f"{str(tree_item.get_encode_tag())} ({str(hex(tree_item.get_encode_tag()))}):"\
             f" {tree_item.get_tag_type()}"
@@ -194,13 +196,13 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
         dialog.offset_field.setText(str(tree_item.get_offset()))
         dialog.length_field.setText(str(tree_item.get_length()))
 
-        dialog.data_input.setPlainText(tree_item.get_decode_value())
+        if not is_parrent:
+            dialog.data_input.setPlainText(tree_item.get_decode_value())
 
         cursor = dialog.data_input.textCursor()
         cursor.movePosition(cursor.End)
         dialog.data_input.setTextCursor(cursor)
 
-        is_parrent = bool(tree_item.get_childs())
         if is_parrent:
             dialog.data_input.setDisabled(True)
 
@@ -225,6 +227,8 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
         cur_item = self.tree_widget.currentItem()
 
         tree_item = cur_item.asn1_tree_element
+        is_parrent = bool(tree_item.get_childs())
+
         dialog.tag_field.setText(
             f"{str(tree_item.get_encode_tag())} ({str(hex(tree_item.get_encode_tag()))}):"\
             f" {tree_item.get_tag_type()}"
@@ -233,13 +237,13 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
         dialog.offset_field.setText(str(tree_item.get_offset()))
         dialog.length_field.setText(str(tree_item.get_length()))
 
-        dialog.data_input.setPlainText(tree_item.get_encode_value().hex().upper())
+        if not is_parrent:
+            dialog.data_input.setPlainText(tree_item.get_encode_value().hex().upper())
 
         cursor = dialog.data_input.textCursor()
         cursor.movePosition(cursor.End)
         dialog.data_input.setTextCursor(cursor)
 
-        is_parrent = bool(tree_item.get_childs())
         if is_parrent:
             dialog.data_input.setDisabled(True)
 
