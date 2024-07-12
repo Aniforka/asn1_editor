@@ -39,6 +39,7 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
         self.show()
 
         self.file_open_action.triggered.connect(self.load_file)
+        self.file_save_action.triggered.connect(self.save_file)
         self.file_save_as_action.triggered.connect(self.save_file_as)
         self.clear_all_action.triggered.connect(self.clear_all)
 
@@ -50,6 +51,8 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
 
     def __init_vars(self):
         self.tree_widget.clear()
+        self.tree_widget.setHeaderLabels([])
+        self.tree_widget.setColumnCount(0)
         del self.tree
         self.tree = Asn1Tree()
         self.cur_file = None
@@ -77,6 +80,23 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
             if file:
                 try:
                     self.tree.export_to_file(file[0])
+                except Exception as exp:
+                    QtWidgets.QMessageBox.critical(self, 'Ошибка сохранения', 'Не удалось сохранить файл', QtWidgets.QMessageBox.Ok)
+                    print(exp)
+                    return
+            else:
+                QtWidgets.QMessageBox.critical(self, 'Ошибка сохранения', 'Файл для сохранения не указан', QtWidgets.QMessageBox.Ok)
+                return
+        else:
+            QtWidgets.QMessageBox.critical(self, 'Ошибка сохранения', 'Нет данных для сохранения', QtWidgets.QMessageBox.Ok)
+            return
+
+
+    def save_file(self):
+        if self.tree.get_root() is not None:
+            if self.cur_file:
+                try:
+                    self.tree.export_to_file(self.cur_file)
                 except Exception as exp:
                     QtWidgets.QMessageBox.critical(self, 'Ошибка сохранения', 'Не удалось сохранить файл', QtWidgets.QMessageBox.Ok)
                     print(exp)
