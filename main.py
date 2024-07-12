@@ -47,6 +47,7 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
         self.tree_widget.action_save_node_as_signal.connect(self.save_node_as)
         self.tree_widget.edit_item_signal.connect(self.edit_tree_item)
         self.tree_widget.edit_hex_item_signal.connect(self.edit_hex_tree_item)
+        self.tree_widget.copy_item_signal.connect(self.copy_item_to_clipboard)
         self.tree_widget.delete_item_signal.connect(self.delete_tree_item)
 
 
@@ -151,6 +152,7 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
 
         self.draw_tree()
 
+
     def save_node_as(self):
         cur_item = self.tree_widget.currentItem()
 
@@ -239,6 +241,14 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
                 self.tree.edit_node(tree_item, new_value, True)
 
         self.draw_tree()
+
+
+    def copy_item_to_clipboard(self):
+        cur_item = self.tree_widget.currentItem()
+        value = cur_item.asn1_tree_element.get_encode_value()
+        clipboard = app.clipboard()
+        clipboard.setText(value.hex().upper())
+
 
     def delete_tree_item(self):
         cur_item = self.tree_widget.currentItem()

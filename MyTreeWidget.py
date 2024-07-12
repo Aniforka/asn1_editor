@@ -8,6 +8,7 @@ class MyTreeWidget(QTreeWidget):
     action_save_node_as_signal = pyqtSignal() # Сигнал о сохранении узла
     edit_item_signal = pyqtSignal()  # Сигнал об изменении
     edit_hex_item_signal = pyqtSignal()  # Сигнал об изменении (hex)
+    copy_item_signal = pyqtSignal()  # Сигнал об копировании (hex)
     delete_item_signal = pyqtSignal()  # Сигнал об удалении
 
     def __init__(self):
@@ -18,12 +19,14 @@ class MyTreeWidget(QTreeWidget):
         self.action_save_node_as = QAction("Сохранить узел как...", self)
         self.action_edit = QAction("Редактировать", self)
         self.action_edit_hex = QAction("Редактировать в HEX", self)
+        self.action_copy = QAction("Копировать", self)
         self.action_delete = QAction("Удалить", self)
 
         self.action_create.triggered.connect(self.create_item)
         self.action_save_node_as.triggered.connect(self.save_node_as)
         self.action_edit.triggered.connect(self.edit_item)
         self.action_edit_hex.triggered.connect(self.edit_hex_item)
+        self.action_copy.triggered.connect(self.copy_item)
         self.action_delete.triggered.connect(self.delete_item)
 
         self.itemDoubleClicked.connect(self.on_item_double_clicked)
@@ -35,6 +38,7 @@ class MyTreeWidget(QTreeWidget):
         menu.addAction(self.action_save_node_as)
         menu.addAction(self.action_edit)
         menu.addAction(self.action_edit_hex)
+        menu.addAction(self.action_copy)
         menu.addAction(self.action_delete)
 
         item = self.currentItem()
@@ -57,6 +61,9 @@ class MyTreeWidget(QTreeWidget):
 
     def edit_hex_item(self):
         self.edit_hex_item_signal.emit()
+
+    def copy_item(self):
+        self.copy_item_signal.emit()
 
     def delete_item(self):
         result = QMessageBox.question(self, 'Подтверждение', "Вы действительно хотите удалить элемент?", QMessageBox.Yes | QMessageBox.No)
