@@ -1,3 +1,4 @@
+import base64
 from Asn1Parser import Asn1Parser
 from Asn1TreeElement import Asn1TreeElement
 
@@ -9,6 +10,11 @@ class Asn1Tree:
     def import_from_file(self, file_path: str) -> None:
         with open(file_path, "rb") as f:
             data = f.read()
+
+        # try:
+        #     data = base64.b64decode(data)
+        # except Exception as exp:
+        #     pass
 
         offset = 0
         # offset - 1 - length_len if length_len else offset - 2
