@@ -46,7 +46,7 @@ class Asn1Parser:
         # Определяем тип класса и constructed/primitive
         class_ = tag & 0xC0
         constructed = tag & 0x20
-
+        tag_length = 1
         # Читаем номер тега
         tag_number = tag & 0x1F
         if tag_number == 0x1F:
@@ -54,6 +54,7 @@ class Asn1Parser:
             while True:
                 byte = data[offset]
                 offset += 1
+                tag_length += 1
                 tag_number = (tag_number << 7) | (byte & 0x7F)
                 if not byte & 0x80:
                     break
@@ -76,7 +77,8 @@ class Asn1Parser:
         tag_type = Asn1Parser.__get_tag_type(tag_class, tag_number)
         # print(offset, tag_type, f"({tag_number})", length, data[offset : offset + length].hex().upper())
 
-        displayed_offset = offset - 1 - length_len if length_len else offset - 2
+        displayed_offset = offset - tag_length - length_len
+        displayed_offset -= 1 if length_len > 1 else 0
         # print(Asn1Parser.is_valid_asn1(data[offset:offset + length]))
         # костыль
         encode_info = [tag, tag_number, class_ >> 6, offset]
