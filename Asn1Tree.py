@@ -1,4 +1,3 @@
-import base64
 from Asn1Parser import Asn1Parser
 from Asn1TreeElement import Asn1TreeElement
 

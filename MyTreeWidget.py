@@ -1,7 +1,6 @@
-from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem, QMenu, QAction, QApplication, QMessageBox
+from PyQt5.QtWidgets import QTreeWidget, QMenu, QAction, QMessageBox
 from PyQt5.QtCore import pyqtSignal
 
-from Asn1Tree import Asn1Tree
 
 class MyTreeWidget(QTreeWidget):
     create_item_signal = pyqtSignal()  # Сигнал о создании
