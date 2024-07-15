@@ -367,9 +367,11 @@ class Asn1Tree:
         offset_changes = 1 + element.get_length() + Asn1Parser.get_length_len(element.get_length())
         # print(offset_changes)
         additional_offset = 0
+        # print(first_new_elem.get_uid())
 
         was_element = False
         nodes_to_visit = [self.root]
+        visited_nodes = set()
 
         while nodes_to_visit:
             current_node = nodes_to_visit.pop(0)
@@ -377,17 +379,19 @@ class Asn1Tree:
             if current_node.get_uid() == element.get_uid():
                 was_element = True
                 current_node.get_parrent().get_childs().remove(element)
+
                 continue
 
             if self.__is_grand_parrent(current_node, element.get_uid()): # Элементы выше и включают в себя "наш" элемент
-                new_length = current_node.get_length() - offset_changes
-                offset = Asn1Parser.get_length_len(current_node.get_length()) - Asn1Parser.get_length_len(new_length)
-                additional_offset += abs(offset)
-                current_node.set_length(new_length)
+                additional_offset += self.check_length_len_parrents(current_node, -offset_changes, visited_nodes)
             elif was_element: # элементы ниже "нашего" элемента
-                current_node.set_offset(current_node.get_offset() - offset_changes - additional_offset)
+                if current_node.get_uid() in visited_nodes:
+                    current_node.set_offset(current_node.get_offset() - offset_changes)
+                else:
+                    current_node.set_offset(current_node.get_offset() - offset_changes + additional_offset)
             else:  # элементы выше и НЕ включают в себя "наш" элемент
-                current_node.set_offset(current_node.get_offset() - additional_offset)
+                # current_node.set_offset(current_node.get_offset() + additional_offset)
+                pass
 
             for child in reversed(current_node.get_childs()):
                 nodes_to_visit.insert(0, child)
@@ -437,26 +441,30 @@ class Asn1Tree:
 
         offset_changes = 2
         additional_offset = 0
+        # print(first_new_elem.get_uid())
 
         was_element = False
         nodes_to_visit = [self.root]
+        visited_nodes = set()
 
         while nodes_to_visit:
             current_node = nodes_to_visit.pop(0)
 
             if current_node.get_uid() == new_element.get_uid():
                 was_element = True
+
                 continue
 
             if self.__is_grand_parrent(current_node, new_element.get_uid()): # Элементы выше и включают в себя "наш" элемент
-                new_length = current_node.get_length() + offset_changes
-                offset = Asn1Parser.get_length_len(current_node.get_length()) - Asn1Parser.get_length_len(new_length)
-                additional_offset += offset
-                current_node.set_length(new_length)
+                additional_offset += self.check_length_len_parrents(current_node, offset_changes, visited_nodes)
             elif was_element: # элементы ниже "нашего" элемента
-                current_node.set_offset(current_node.get_offset() + offset_changes + additional_offset)
+                if current_node.get_uid() in visited_nodes:
+                    current_node.set_offset(current_node.get_offset() + offset_changes)
+                else:
+                    current_node.set_offset(current_node.get_offset() + offset_changes + additional_offset)
             else:  # элементы выше и НЕ включают в себя "наш" элемент
-                current_node.set_offset(current_node.get_offset() + additional_offset)
+                # current_node.set_offset(current_node.get_offset() + additional_offset)
+                pass
 
             for child in reversed(current_node.get_childs()):
                 nodes_to_visit.insert(0, child)
@@ -480,26 +488,30 @@ class Asn1Tree:
             Asn1Parser.get_length_len(element.get_length()) - Asn1Parser.get_length_len(old_length)
 
         additional_offset = 0
+        # print(first_new_elem.get_uid())
 
         was_element = False
         nodes_to_visit = [self.root]
+        visited_nodes = set()
 
         while nodes_to_visit:
             current_node = nodes_to_visit.pop(0)
 
             if current_node.get_uid() == element.get_uid():
                 was_element = True
+
                 continue
 
             if self.__is_grand_parrent(current_node, element.get_uid()): # Элементы выше и включают в себя "наш" элемент
-                new_length = current_node.get_length() + offset_changes
-                offset = Asn1Parser.get_length_len(current_node.get_length()) - Asn1Parser.get_length_len(new_length)
-                additional_offset += offset
-                current_node.set_length(new_length)
+                additional_offset += self.check_length_len_parrents(current_node, offset_changes, visited_nodes)
             elif was_element: # элементы ниже "нашего" элемента
-                current_node.set_offset(current_node.get_offset() + offset_changes + additional_offset)
+                if current_node.get_uid() in visited_nodes:
+                    current_node.set_offset(current_node.get_offset() + offset_changes)
+                else:
+                    current_node.set_offset(current_node.get_offset() + offset_changes + additional_offset)
             else:  # элементы выше и НЕ включают в себя "наш" элемент
-                current_node.set_offset(current_node.get_offset() + additional_offset)
+                # current_node.set_offset(current_node.get_offset() + additional_offset)
+                pass
 
             for child in reversed(current_node.get_childs()):
                 nodes_to_visit.insert(0, child)
