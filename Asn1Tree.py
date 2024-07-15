@@ -108,33 +108,81 @@ class Asn1Tree:
 
             offset = new_offset
 
+        was_elems = list()
+
+
         offset_changes = len(new_node_bytes)
         additional_offset = 0
         # print(first_new_elem.get_uid())
 
         was_element = False
         nodes_to_visit = [self.root]
+        visited_nodes = set()
 
         while nodes_to_visit:
             current_node = nodes_to_visit.pop(0)
 
             if current_node.get_uid() == first_new_elem.get_uid():
                 was_element = True
+
+                # tmp_nodes = [first_new_elem]
+
+                # while tmp_nodes:
+                #     tmp_current_node = tmp_nodes.pop(0)
+                #     tmp_current_node.set_offset(tmp_current_node.get_offset() + additional_offset)
+                #     for child in reversed(tmp_current_node.get_childs()):
+                #         tmp_nodes.insert(0, child)
+
                 continue
             # print(current_node.get_uid(), was_element)
-            if self.__is_grand_parrent(current_node, new_element.get_uid()): # Элементы выше и включают в себя "наш" элемент
-                new_length = current_node.get_length() + offset_changes
-                offset = Asn1Parser.get_length_len(current_node.get_length()) - Asn1Parser.get_length_len(new_length)
-                additional_offset += offset
-                current_node.set_length(new_length)
+            if self.__is_grand_parrent(current_node, first_new_elem.get_uid()): # Элементы выше и включают в себя "наш" элемент
+                additional_offset += self.check_length_len_parrents(current_node, offset_changes, visited_nodes)
             elif was_element: # элементы ниже "нашего" элемента
-                current_node.set_offset(current_node.get_offset() + offset_changes + additional_offset)
+                if current_node.get_uid() in visited_nodes:
+                    current_node.set_offset(current_node.get_offset() + offset_changes)
+                else:
+                    current_node.set_offset(current_node.get_offset() + offset_changes + additional_offset)
+
                 # print(current_node.get_tag_type())
             else:  # элементы выше и НЕ включают в себя "наш" элемент
-                current_node.set_offset(current_node.get_offset() + additional_offset)
+                # current_node.set_offset(current_node.get_offset() + additional_offset)
+                pass
 
             for child in reversed(current_node.get_childs()):
                 nodes_to_visit.insert(0, child)
+
+
+    def check_length_len_parrents(self, cur_node: Asn1TreeElement, offset_len: Asn1TreeElement, visited_nodes: set) -> int:
+        if cur_node is None: return 0
+
+        additional_offset = 0
+        new_length = cur_node.get_length() + offset_len
+        offset = Asn1Parser.get_length_len(new_length) - Asn1Parser.get_length_len(cur_node.get_length())
+        cur_node.set_length(new_length)
+
+        if offset:
+            self.add_childs_offset(cur_node, offset, visited_nodes)
+
+        # for child in cur_node.get_childs():
+        #     child.set_offset(child.get_offset() + offset)
+
+        # cur_node.set_offset(cur_node.get_offset() + offset)
+        additional_offset += offset
+
+        parrent = cur_node.get_parrent()
+
+        while parrent is not None:
+            additional_offset += self.check_length_len_parrents(parrent, offset, visited_nodes)
+            parrent = parrent.get_parrent()
+            
+
+        return additional_offset
+    
+    def add_childs_offset(self, cur_node: Asn1TreeElement, change_offset: Asn1TreeElement, visited_nodes: set) -> None:
+        for child in cur_node.get_childs():
+            visited_nodes.add(child.get_uid())
+            child.set_offset(child.get_offset() + change_offset)
+            self.add_childs_offset(child, change_offset, visited_nodes)
 
 
     def insert_node_after(self, cur_node: Asn1TreeElement, new_node: str) -> None:
