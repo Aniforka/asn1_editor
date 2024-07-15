@@ -16,15 +16,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
-     <layout class="QHBoxLayout" name="Layout_ToolBar">
-      <item>
-       <widget class="QPushButton" name="tmp001">
-        <property name="text">
-         <string>PushButton</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     <layout class="QHBoxLayout" name="Layout_ToolBar"/>
     </item>
     <item>
      <layout class="QVBoxLayout" name="layout_Tree"/>
@@ -51,13 +43,7 @@
     <addaction name="separator"/>
     <addaction name="clear_all_action"/>
    </widget>
-   <widget class="QMenu" name="menu_2">
-    <property name="title">
-     <string>Помощь</string>
-    </property>
-   </widget>
    <addaction name="menu"/>
-   <addaction name="menu_2"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="file_open_action">
