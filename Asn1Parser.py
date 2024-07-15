@@ -172,7 +172,7 @@ class Asn1Parser:
             # print(value)
             oid = core.ObjectIdentifier(value=value)
             return oid.dump()[2:]  # Убираем первые два байта (тег и длина)
-        elif tag_type in ("UTF8String", "PrintableString", "IA5String", "VisibleString"):
+        elif tag_type in ("UTF8String", "PrintableString", "IA5String", "VisibleString", "NumericString"):
             return value.encode("utf-8")
         elif tag_type == "UTCTime":
             return value.encode("ascii")
