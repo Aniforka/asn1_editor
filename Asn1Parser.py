@@ -351,7 +351,7 @@ class Asn1Parser:
                 return core.ObjectIdentifier.load(bytes(oid_bytes)).dotted
             except ValueError:
                 return f"Invalid OID: {value.hex()}" 
-        if tag_type in ("UTF8String", "PrintableString", "IA5String", "VisibleString"):
+        if tag_type in ("UTF8String", "PrintableString", "IA5String", "VisibleString", "NumericString"):
             return value.decode("utf-8", errors="replace")
         if tag_type == "UTCTime":
             try:
