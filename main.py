@@ -289,7 +289,7 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
         try:
             self.tree.remove_node(cur_item.asn1_tree_element)
         except Exception as exp:
-            QtWidgets.QMessageBox.critical(self, 'Ошибка удаления', 'Не удалить элемент', QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.critical(self, 'Ошибка удаления', 'Не получилось удалить элемент', QtWidgets.QMessageBox.Ok)
             print(exp)
             return
 
@@ -300,13 +300,28 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
         cur_item = self.tree_widget.currentItem()
         clipboard = app.clipboard()
 
-        self.tree.insert_node_before(cur_item.asn1_tree_element, clipboard.text().replace(' ', ''))
+        try:
+            self.tree.insert_node_before(cur_item.asn1_tree_element, clipboard.text().replace(' ', ''))
+        except Exception as exp:
+            QtWidgets.QMessageBox.critical(self, 'Ошибка вставки', 'Не получилось вставить элемент', QtWidgets.QMessageBox.Ok)
+            print(exp)
+            return
 
         self.draw_tree()
 
     
     def insert_item_after(self):
-        pass
+        cur_item = self.tree_widget.currentItem()
+        clipboard = app.clipboard()
+
+        try:
+            self.tree.insert_node_after(cur_item.asn1_tree_element, clipboard.text().replace(' ', ''))
+        except Exception as exp:
+            QtWidgets.QMessageBox.critical(self, 'Ошибка вставки', 'Не получилось вставить элемент', QtWidgets.QMessageBox.Ok)
+            print(exp)
+            return
+
+        self.draw_tree()
 
 
     def clear_all(self):
