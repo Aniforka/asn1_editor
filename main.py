@@ -50,6 +50,9 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
         self.tree_widget.copy_item_signal.connect(self.copy_item_to_clipboard)
         self.tree_widget.delete_item_signal.connect(self.delete_tree_item)
 
+        self.tree_widget.insert_item_before_signal.connect(self.insert_item_before)
+        self.tree_widget.insert_item_after_signal.connect(self.insert_item_after)
+
 
     def __init_vars(self):
         self.tree_widget.clear()
@@ -291,6 +294,19 @@ class Ui(QtWidgets.QMainWindow, QtWidgets.QWidget): #класс основого
             return
 
         self.draw_tree()
+
+
+    def insert_item_before(self):
+        cur_item = self.tree_widget.currentItem()
+        clipboard = app.clipboard()
+
+        self.tree.insert_node_before(cur_item.asn1_tree_element, clipboard.text().replace(' ', ''))
+
+        self.draw_tree()
+
+    
+    def insert_item_after(self):
+        pass
 
 
     def clear_all(self):

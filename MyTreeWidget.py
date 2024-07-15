@@ -9,6 +9,8 @@ class MyTreeWidget(QTreeWidget):
     edit_hex_item_signal = pyqtSignal()  # Сигнал об изменении (hex)
     copy_item_signal = pyqtSignal()  # Сигнал об копировании (hex)
     delete_item_signal = pyqtSignal()  # Сигнал об удалении
+    insert_item_before_signal = pyqtSignal() # Сигнал о вставке перед
+    insert_item_after_signal = pyqtSignal() # Сигнал о вставке после
 
     def __init__(self):
         super().__init__()
@@ -20,6 +22,8 @@ class MyTreeWidget(QTreeWidget):
         self.action_edit_hex = QAction("Редактировать в HEX", self)
         self.action_copy = QAction("Копировать", self)
         self.action_delete = QAction("Удалить", self)
+        self.action_insert_before = QAction("Вставить перед", self)
+        self.action_insert_after = QAction("Вставить после", self)
 
         self.action_create.triggered.connect(self.create_item)
         self.action_save_node_as.triggered.connect(self.save_node_as)
@@ -27,6 +31,8 @@ class MyTreeWidget(QTreeWidget):
         self.action_edit_hex.triggered.connect(self.edit_hex_item)
         self.action_copy.triggered.connect(self.copy_item)
         self.action_delete.triggered.connect(self.delete_item)
+        self.action_insert_before.triggered.connect(self.insert_before_item)
+        self.action_insert_after.triggered.connect(self.inser_after_item)
 
         self.itemDoubleClicked.connect(self.on_item_double_clicked)
 
@@ -40,6 +46,8 @@ class MyTreeWidget(QTreeWidget):
         menu.addAction(self.action_edit_hex)
         menu.addAction(self.action_copy)
         menu.addAction(self.action_delete)
+        menu.addAction(self.action_insert_before)
+        menu.addAction(self.action_insert_after)
 
         item = self.currentItem()
         is_item_valid = not item.asn1_tree_element.is_primitive()
@@ -76,3 +84,9 @@ class MyTreeWidget(QTreeWidget):
 
     def on_item_double_clicked(self, item, column):
         self.edit_item_signal.emit()
+
+    def insert_before_item(self):
+        self.insert_item_before_signal.emit()
+
+    def inser_after_item(self):
+        self.insert_item_after_signal.emit()

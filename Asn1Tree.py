@@ -52,6 +52,90 @@ class Asn1Tree:
 
             offset = new_offset
 
+
+    def insert_node_before(self, cur_node: Asn1TreeElement, new_node: str) -> None:
+        new_node_bytes = bytes.fromhex(new_node)
+
+        offset = 0
+        # offset - 1 - length_len if length_len else offset - 2
+        cur_elem = cur_node.get_parrent()
+        childs = cur_elem.get_childs()
+        index = childs.index(cur_node)
+        first_new_elem = None
+
+        if index:
+            last_element = childs[index - 1]
+        else:
+            last_element = cur_elem
+
+        new_global_offset = cur_node.get_offset()
+        # print(cur_node.get_length(), cur_node.get_offset())
+
+        while offset < len(new_node_bytes):
+            new_offset, displayed_offset, tag_type, length, value, decoded_value, __constructed, encode_info = Asn1Parser.decode(new_node_bytes, offset)
+            is_primitive = True if value is not None or tag_type == "OCTET STRING" else False
+
+            new_element = Asn1TreeElement(
+                cur_elem,
+                decoded_value,
+                value, tag_type,
+                length,
+                new_global_offset + displayed_offset,
+                self.next_uid,
+                is_primitive,
+                *encode_info
+            )
+
+            if first_new_elem is None:
+                first_new_elem = new_element
+                print(first_new_elem.get_length(), first_new_elem.get_offset())
+
+            if index is not None:
+                childs.insert(index, new_element)
+                index = None
+                childs = None
+            elif cur_elem is not None:
+                cur_elem.add_child(new_element)
+
+            self.next_uid += 1
+            cur_elem = new_element
+
+            if not __constructed:
+                while self.__is_parent_level_traversal_needed(cur_elem):
+                    cur_elem = cur_elem.get_parrent()
+                if cur_elem.get_parrent() is not None:
+                    cur_elem = cur_elem.get_parrent()
+
+            offset = new_offset
+
+        offset_changes = len(new_node_bytes)
+        additional_offset = 0
+        # print(first_new_elem.get_uid())
+
+        was_element = False
+        nodes_to_visit = [self.root]
+
+        while nodes_to_visit:
+            current_node = nodes_to_visit.pop(0)
+
+            if current_node.get_uid() == first_new_elem.get_uid():
+                was_element = True
+                continue
+            # print(current_node.get_uid(), was_element)
+            if self.__is_grand_parrent(current_node, new_element.get_uid()): # Элементы выше и включают в себя "наш" элемент
+                new_length = current_node.get_length() + offset_changes
+                offset = Asn1Parser.get_length_len(current_node.get_length()) - Asn1Parser.get_length_len(new_length)
+                additional_offset += offset
+                current_node.set_length(new_length)
+            elif was_element: # элементы ниже "нашего" элемента
+                current_node.set_offset(current_node.get_offset() + offset_changes + additional_offset)
+                # print(current_node.get_tag_type())
+            else:  # элементы выше и НЕ включают в себя "наш" элемент
+                current_node.set_offset(current_node.get_offset() + additional_offset)
+
+            for child in reversed(current_node.get_childs()):
+                nodes_to_visit.insert(0, child)
+
             
     def __is_parent_level_traversal_needed(self, cur_node: Asn1TreeElement) -> bool:
         parrent = cur_node.get_parrent()
@@ -83,6 +167,7 @@ class Asn1Tree:
                     constructed
                 )
             )
+            # print(current_node.get_tag_type())
 
             for child in reversed(current_node.get_childs()):
                 nodes_to_visit.insert(0, (child, level + 1))
