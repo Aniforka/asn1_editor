@@ -339,7 +339,8 @@ class Asn1Parser:
     def decode_primitive_value(tag_type: str, value, length: int):
         """Декодирует значение примитивного типа ASN.1."""
         if tag_type == "INTEGER":
-            return hex(int.from_bytes(value, byteorder="big", signed=True))[2:].upper()
+            # return hex(int.from_bytes(value, byteorder="big", signed=True))[2:].upper()
+            return value.hex().upper()
         if tag_type == "OCTET STRING":
             return value.hex().upper()
         if tag_type == "OBJECT IDENTIFIER":
